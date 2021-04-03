@@ -3,17 +3,19 @@ package com.cse123group10.chess
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 
 class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     // setup variables used for sizing of board
-    private final val paint = Paint()
-    private final val lengthSquare: Int
+    private val paint = Paint()
+    private val lengthSquare: Int
         get() = (width-20)/8
-    private final val xStart = 10f
-    private final val yStart = 250f
-    private final val xStartInt = 10
-    private final val yStartInt = 250
+    private val xStart = 10f
+    private val yStart = 250f
+    private var pieceStartX = -1
+    private var pieceStartY = -1
     // images taken from
     // https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
     private val imgIDs = setOf(
@@ -31,15 +33,42 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
         R.drawable.whiterook,
     )
     private val bitmaps = mutableMapOf<Int, Bitmap>()
+
+    var boardInterface: ChessInterface? = null
     // run on start up
     init{
         loadBitMaps()
     }
+    // function used to draw everything on screen
     override fun onDraw(canvas: Canvas?){
+        canvas ?: return
         drawBoard(canvas)
         drawPieces(canvas)
     }
-    // draw chess board
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event ?: return false
+        when (event.action){
+            MotionEvent.ACTION_DOWN->{
+                pieceStartX = ((event.x-xStart)/lengthSquare).toInt()
+                pieceStartY = ((event.y-yStart)/lengthSquare).toInt()
+            }
+            MotionEvent.ACTION_UP->{
+                var pieceGotoX = ((event.x-xStart)/lengthSquare).toInt()
+                var pieceGotoY = ((event.y-yStart)/lengthSquare).toInt()
+                boardInterface?.movePiece(pieceStartX,pieceStartY,pieceGotoX,pieceGotoY)
+                Log.d(debug_TAG,"($pieceStartX,$pieceStartY)->($pieceGotoX,$pieceGotoY)")
+                pieceStartX = -1
+                pieceStartY = -1
+
+            }
+            MotionEvent.ACTION_MOVE->{
+            }
+        }
+        return true
+    }
+    // helper function that draws chess board squares
+    // shows white pieces on bottom
     private fun drawBoard(canvas: Canvas?){
         for(j in 0..3) {
             for (i in 0..3) {
@@ -92,11 +121,9 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
     }
     // draw each piece in inital places
     private fun drawPieces(canvas: Canvas?){
-        val boardModel = Board()
-        boardModel.startUp()
         for(j in 0..7){
             for (i in 0..7){
-                val piece = boardModel.pieceAt(i,j)
+                val piece = boardInterface?.pieceAt(i,j)
                 if (piece != null){
                     drawPieceAt(canvas, i, j, piece.id)
                 }
@@ -107,9 +134,5 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
     private fun drawPieceAt(canvas: Canvas?, col: Int, row: Int, piece: Int){
         val bitmap = bitmaps[piece]!!
         canvas?.drawBitmap(bitmap, null, RectF(xStart+col*lengthSquare,yStart+row*lengthSquare,xStart+(col+1)*lengthSquare,yStart+(row+1)*lengthSquare), paint)
-    }
-    // this function assumes that the move is valid and will not do any error checking
-    private fun movePiece(){
-
     }
 }

@@ -1,5 +1,6 @@
  package com.cse123group10.chess
-
+// this module contains the chess logic portion of the code
+// it handles placing and mocing pieces
 class Board {
     // creates all pieces
     var piecebox = mutableSetOf<Pieces>()
@@ -44,6 +45,76 @@ class Board {
             }
         }
         return null
+    }
+    fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTo: Int){
+        val origPiece = pieceAt(xOrig,yOrig)
+        if (origPiece != null){
+            val piece = pieceAt(xTo,yTo)
+            if(piece != null){
+                if (origPiece.player != piece.player) {
+                    if(origPiece.type == Type.pawn){
+                        if(attackPawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            piecebox.remove(piece)
+                            piecebox.remove(origPiece)
+                            piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
+                        }
+                    }
+                }else{
+                    return
+                }
+            }else{
+            if(origPiece.type == Type.pawn){
+                if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                    piecebox.remove(origPiece)
+                    piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
+                }
+            }
+            //piecebox.remove(origPiece)
+            //piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
+            }
+        }
+    }
+    // sees if pawn is able move forward
+    private fun movePawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if (color == Player.white) {
+            if(yOrig == 6 && xOrig==xTo){
+                if(yTo == 5 && pieceAt(xTo,yTo)==null){
+                    return true
+                }else if(yTo == 4 && pieceAt(xTo,5)==null && pieceAt(xTo,4)==null){
+                    return true
+                }
+            }else if(xOrig==xTo && yOrig-1 == yTo){
+                return pieceAt(xTo,yTo)==null
+            }
+        }else if(color == Player.black){
+            if(yOrig == 1 && xOrig==xTo){
+                if(yTo == 2 && pieceAt(xTo,yTo)==null){
+                    return true
+                }else if(yTo == 3 && pieceAt(xTo,2)==null && pieceAt(xTo,3)==null){
+                    return true
+                }
+            } else if(xOrig==xTo && yOrig+1 == yTo){
+                return pieceAt(xTo,yTo)==null
+            }
+        }
+        return false
+    }
+    // checks to see if pawn is able to attack
+    private fun attackPawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if (color == Player.white) {
+            if(xOrig-1==xTo || xOrig+1==xTo){
+                if(yOrig-1 == yTo){
+                    return pieceAt(xTo,yTo)!=null
+                }
+            }
+        }else if(color == Player.black){
+            if(xOrig-1==xTo || xOrig+1==xTo){
+                if(yOrig+1 == yTo){
+                    return pieceAt(xTo,yTo)!=null
+                }
+            }
+        }
+        return false
     }
     // creates a printout of the board in the terminal(logcat)
     override fun toString(): String {

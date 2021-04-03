@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Chess</string>
+    <string name="resetButton">Reset</string>
+    <string name="textBox">Host/IP, Enter CPU for computer</string>
+    <string name="connectButton">Connect</string>
+    <string name="hostButton">Host</string>
 </resources>
