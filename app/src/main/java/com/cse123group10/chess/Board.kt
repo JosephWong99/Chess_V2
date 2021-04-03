@@ -1,5 +1,8 @@
  package com.cse123group10.chess
-// this module contains the chess logic portion of the code
+
+ import kotlin.math.abs
+
+ // this module contains the chess logic portion of the code
 // it handles placing and mocing pieces
 class Board {
     // creates all pieces
@@ -52,27 +55,67 @@ class Board {
             val piece = pieceAt(xTo,yTo)
             if(piece != null){
                 if (origPiece.player != piece.player) {
-                    if(origPiece.type == Type.pawn){
-                        if(attackPawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                            piecebox.remove(piece)
-                            piecebox.remove(origPiece)
-                            piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
+                    if(origPiece.type == Type.pawn && attackPawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        killPiece(origPiece,piece,xTo,yTo)
+                    }else if(origPiece.type == Type.rook && moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        killPiece(origPiece,piece,xTo,yTo)
+                    }else if(origPiece.type == Type.king){
+                        if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            killPiece(origPiece,piece,xTo,yTo)
+                        }
+                    }else if(origPiece.type == Type.knight){
+                        if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            killPiece(origPiece,piece,xTo,yTo)
+                        }
+                    }else if(origPiece.type == Type.bishop){
+                        if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            killPiece(origPiece,piece,xTo,yTo)
+                        }
+                    }else if(origPiece.type == Type.queen){
+                        if(moveQueen(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            killPiece(origPiece,piece,xTo,yTo)
                         }
                     }
                 }else{
                     return
                 }
             }else{
-            if(origPiece.type == Type.pawn){
-                if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                    piecebox.remove(origPiece)
-                    piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
+                if(origPiece.type == Type.pawn){
+                    if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
+                }else if(origPiece.type == Type.rook){
+                    if(moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
+                }else if(origPiece.type == Type.king){
+                    if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
+                }else if(origPiece.type == Type.queen){
+                    if(moveQueen(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
+                }else if(origPiece.type == Type.bishop){
+                    if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
+                }else if(origPiece.type == Type.knight){
+                    if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                        movePiece(origPiece,xTo,yTo)
+                    }
                 }
             }
-            //piecebox.remove(origPiece)
-            //piecebox.add(Pieces(xTo,yTo,origPiece.player,origPiece.type,origPiece.id))
-            }
         }
+    }
+    private fun killPiece(movingPiece: Pieces, deadPiece: Pieces, xTo: Int, yTo: Int){
+        piecebox.remove(deadPiece)
+        piecebox.remove(movingPiece)
+        piecebox.add(Pieces(xTo,yTo,movingPiece.player,movingPiece.type,movingPiece.id))
+    }
+    private fun movePiece(movingPiece: Pieces, xTo: Int, yTo: Int){
+        piecebox.remove(movingPiece)
+        piecebox.add(Pieces(xTo,yTo,movingPiece.player,movingPiece.type,movingPiece.id))
     }
     // sees if pawn is able move forward
     private fun movePawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
@@ -116,6 +159,43 @@ class Board {
         }
         return false
     }
+    //
+    private  fun moveRook(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if(xOrig == xTo || yOrig == yTo){
+            return true
+        }
+        return false
+    }
+    private fun moveBishop(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if(xOrig==xTo||yOrig==yTo){
+            return false
+        }
+        var deltaX = abs(xOrig-xTo)
+        var deltaY = abs(yOrig-yTo)
+        if(deltaX==deltaY){
+            return true
+        }
+        return false
+    }
+    private fun moveQueen(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        return moveBishop(xOrig,yOrig,xTo,yTo,color)||moveRook(xOrig,yOrig,xTo,yTo,color)
+    }
+    private fun moveKing(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if((xOrig+1==xTo || xOrig-1 == xTo || xOrig == xTo) && (yOrig+1==yTo||yOrig-1==yTo || yOrig == yTo)){
+            return true
+        }
+        return false
+    }
+    private fun moveKnight(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+        if((xOrig+2==xTo || xOrig-2==xTo) && (yOrig+1==yTo||yOrig-1==yTo)){
+            return true
+        }
+        if((xOrig+1==xTo || xOrig-1==xTo) && (yOrig+2==yTo||yOrig-2==yTo)){
+            return true
+        }
+        return false
+    }
+
     // creates a printout of the board in the terminal(logcat)
     override fun toString(): String {
         var board = " \n"
