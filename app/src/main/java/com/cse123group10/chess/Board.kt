@@ -1,6 +1,13 @@
  package com.cse123group10.chess
 
  import kotlin.math.abs
+/*TODO
+  Add if king in check, make sure king isn't in check on next move
+  add message for when king in check/mate
+  add castling
+  add en passant
+  */
+
 
  // this module contains the chess logic portion of the code
 // it handles placing and mocing pieces
