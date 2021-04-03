@@ -240,39 +240,9 @@ class Board {
             if(deltaX == 1){
                 return true
             }
-            // north west
-            if(xOrig-xTo>0&&yOrig-yTo>0) {
-                for (i in 1..(deltaX-1)) {
-                    if (pieceAt(xOrig - i, yOrig - i) != null) {
-                        return false
-                    }
-                }
+            if(diagCheck(xOrig,yOrig,xTo,yTo,color)){
+                return true
             }
-            // north east
-            if(xOrig-xTo<0&&yOrig-yTo>0) {
-                for (i in 1..(deltaX-1)) {
-                    if (pieceAt(xOrig + i, yOrig - i) != null) {
-                        return false
-                    }
-                }
-            }
-            // south west
-            if(xOrig-xTo>0&&yOrig-yTo<0) {
-                for (i in 1..(deltaX-1)) {
-                    if (pieceAt(xOrig - i, yOrig + i) != null) {
-                        return false
-                    }
-                }
-            }
-            // south east
-            if(xOrig-xTo<0&&yOrig-yTo<0) {
-                for (i in 1..(deltaX-1)) {
-                    if (pieceAt(xOrig + i, yOrig + i) != null) {
-                        return false
-                    }
-                }
-            }
-            return true
         }
         return false
     }
@@ -281,7 +251,9 @@ class Board {
     }
     private fun moveKing(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if((xOrig+1==xTo || xOrig-1 == xTo || xOrig == xTo) && (yOrig+1==yTo||yOrig-1==yTo || yOrig == yTo)){
-            return true
+            if(!kingCheck(xTo,yTo,color)){
+                return true
+            }
         }
         return false
     }
@@ -294,7 +266,43 @@ class Board {
         }
         return false
     }
-
+     private  fun diagCheck(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+         var deltaX = abs(xOrig-xTo)
+         // north west
+         if(xOrig-xTo>0&&yOrig-yTo>0) {
+             for (i in 1..(deltaX-1)) {
+                 if (pieceAt(xOrig - i, yOrig - i) != null) {
+                     return false
+                 }
+             }
+         }else
+         // north east
+         if(xOrig-xTo<0&&yOrig-yTo>0) {
+             for (i in 1..(deltaX-1)) {
+                 if (pieceAt(xOrig + i, yOrig - i) != null) {
+                     return false
+                 }
+             }
+         }else
+         // south west
+         if(xOrig-xTo>0&&yOrig-yTo<0) {
+             for (i in 1..(deltaX-1)) {
+                 if (pieceAt(xOrig - i, yOrig + i) != null) {
+                     return false
+                 }
+             }
+         }else
+         // south east
+         if(xOrig-xTo<0&&yOrig-yTo<0) {
+             for (i in 1..(deltaX-1)) {
+                 if (pieceAt(xOrig + i, yOrig + i) != null) {
+                     return false
+                 }
+             }
+         }
+         return true
+     }
+     // created by spencer
      private fun HorizontalCheck (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (xOrig != xTo) {
              return false
@@ -308,9 +316,8 @@ class Board {
              }
          }
          return true
-
      }
-
+    // created by spencer
      private fun VerticalCheck (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (yOrig != yTo) {
              return false
@@ -325,7 +332,163 @@ class Board {
          }
          return true
      }
-
+     // assumes valid king move, checks if king is in danger(mate)
+     // returns true if king is in mate
+    private fun kingCheck(x: Int, y: Int, color: Player ): Boolean{
+        var piece = kingCheckVertical(x,y,color)
+         if(piece != null){
+             return true
+         }
+         piece = kingCheckHorizontal(x,y,color)
+         if(piece != null){
+             return true
+         }
+         piece = kingCheckDiag(x,y,color)
+         if(piece != null){
+             return true
+         }
+//         piece = kingCheckL(x,y,color)
+//         if(piece != null){
+//             return true
+//         }
+//         piece = kingCheckPawn(x,y,color)
+//         if(piece != null){
+//             return true
+//         }
+        return false
+    }
+     // returns a rook or queen that is in the same col as y
+     private  fun  kingCheckVertical(x: Int, y: Int, color: Player ): Pieces?{
+         for(i in (y-1) downTo 0){
+             val piece = pieceAt(x,i)
+             if(piece != null){
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.rook)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         for (i in (y+1)..7){
+             val piece = pieceAt(x,i)
+             if(piece != null){
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.rook)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         return null
+     }
+     // returns a rook or queen that is in the same row as x
+     private  fun  kingCheckHorizontal(x: Int, y: Int, color: Player ): Pieces?{
+         for(i in (x-1) downTo 0){
+             val piece = pieceAt(i,y)
+             if(piece != null){
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.rook)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         for (i in (x+1)..7){
+             val piece = pieceAt(i,y)
+             if(piece != null){
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.rook)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         return null
+     }
+     // returns a bishop or queen that is in the same diagonal
+     private  fun  kingCheckDiag(x: Int, y: Int, color: Player ): Pieces?{
+         // north west
+         var col = x
+         var row = y
+         for (i in (x-1) downTo 0) {
+             col -= 1
+             row -= 1
+             val piece = pieceAt(col,row)
+             if(col<0 || row<0) break
+             if (piece != null) {
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.bishop)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         // north east
+         col = x
+         row = y
+         for (i in (x+1)..7) {
+             col += 1
+             row -= 1
+             val piece = pieceAt(col,row)
+             if(col>8 || row<0) break
+             if (piece != null) {
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.bishop)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         // south west
+         col = x
+         row = y
+         for (i in (y-1) downTo 0) {
+             col -= 1
+             row += 1
+             val piece = pieceAt(col,row)
+             if(col<0 || row>8) break
+             if (piece != null) {
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.bishop)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         // south east
+         col = x
+         row = y
+         for (i in (y+1)..7) {
+             col += 1
+             row += 1
+             val piece = pieceAt(col,row)
+             if(col>8 || row>8) break
+             if (piece != null) {
+                 if(piece.type==Type.king && color == piece.player) continue
+                 if((piece.type==Type.queen || piece.type==Type.bishop)&& piece.player!=color){
+                     return piece
+                 }else{
+                     break
+                 }
+             }
+         }
+         return null
+     }
+     // returns a knight that is able to attack the king
+     private  fun  kingCheckL(x: Int, y: Int, color: Player ): Pieces?{
+         return null
+     }
+     // returns a pawn that is able to attack the king
+     private  fun  kingCheckPawn(x: Int, y: Int, color: Player ): Pieces?{
+         return null
+     }
     // creates a printout of the board in the terminal(logcat)
     override fun toString(): String {
         var board = " \n"
