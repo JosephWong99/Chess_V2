@@ -1,5 +1,6 @@
  package com.cse123group10.chess
 
+ import android.util.Log
  import kotlin.math.abs
 
  // this module contains the chess logic portion of the code
@@ -7,6 +8,7 @@
 class Board {
     // creates all pieces
     var piecebox = mutableSetOf<Pieces>()
+     var turn: Player = Player.white
     //
     init{
         piecebox.removeAll(piecebox)
@@ -15,6 +17,7 @@ class Board {
     // add pieces to correct locations
     fun startUp(){
         piecebox.removeAll(piecebox)
+        turn = Player.white
         // add white pieces
         piecebox.add(Pieces(0,7,Player.white, Type.rook,R.drawable.whiterook))
         piecebox.add(Pieces(7,7,Player.white, Type.rook,R.drawable.whiterook))
@@ -49,65 +52,114 @@ class Board {
         }
         return null
     }
-    fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTo: Int){
+    fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTon: Int){
         val origPiece = pieceAt(xOrig,yOrig)
+        var yTo: Int
+        if (yTon < 0){
+            yTo = 0
+        }else{
+            yTo = yTon
+        }
+        Log.d(debug_TAG, "ljksahdflkjdash $xTo")
+        Log.d(debug_TAG, toString())
         if (origPiece != null){
-            val piece = pieceAt(xTo,yTo)
-            if(piece != null){
-                if (origPiece.player != piece.player) {
-                    if(origPiece.type == Type.pawn && attackPawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        killPiece(origPiece,piece,xTo,yTo)
-                    }else if(origPiece.type == Type.rook && moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        killPiece(origPiece,piece,xTo,yTo)
+            if(origPiece.player == turn){
+                val piece = pieceAt(xTo,yTo)
+                if(piece != null){
+                    if (origPiece.player != piece.player) {
+                        if(origPiece.type == Type.pawn && attackPawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            if(promotion(xTo,yTo, origPiece.player)){
+                                piecebox.remove(piece)
+                                piecebox.remove(origPiece)
+                                if (origPiece.player == Player.white){
+                                    piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.whitequeen))
+                                }else {
+                                    piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.blackqueen))
+                                }
+                            }else{
+                                killPiece(origPiece,piece,xTo,yTo)
+                            }
+                            turn = changeTurn(turn)
+                        }else if(origPiece.type == Type.rook && moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            killPiece(origPiece,piece,xTo,yTo)
+                            turn = changeTurn(turn)
+                        }else if(origPiece.type == Type.king){
+                            if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                                killPiece(origPiece,piece,xTo,yTo)
+                                turn = changeTurn(turn)
+                            }
+                        }else if(origPiece.type == Type.knight){
+                            if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                                killPiece(origPiece,piece,xTo,yTo)
+                                turn = changeTurn(turn)
+                            }
+                        }else if(origPiece.type == Type.bishop){
+                            if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                                killPiece(origPiece,piece,xTo,yTo)
+                                turn = changeTurn(turn)
+                            }
+                        }else if(origPiece.type == Type.queen){
+                            if(moveQueen(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                                killPiece(origPiece,piece,xTo,yTo)
+                                turn = changeTurn(turn)
+                            }
+                        }
+                    }else{
+                        return
+                    }
+                }else{
+                    if(origPiece.type == Type.pawn){
+                        if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            if(promotion(xTo,yTo, origPiece.player)){
+                                piecebox.remove(piece)
+                                piecebox.remove(origPiece)
+                                if (origPiece.player == Player.white){
+                                    piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.whitequeen))
+                                }else {
+                                    piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.blackqueen))
+                                }
+                            }else{
+                                movePiece(origPiece,xTo,yTo)
+                            }
+                            turn = changeTurn(turn)
+                        }
+                    }else if(origPiece.type == Type.rook){
+                        if(moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            movePiece(origPiece,xTo,yTo)
+                            turn = changeTurn(turn)
+                        }
                     }else if(origPiece.type == Type.king){
                         if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                            killPiece(origPiece,piece,xTo,yTo)
-                        }
-                    }else if(origPiece.type == Type.knight){
-                        if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                            killPiece(origPiece,piece,xTo,yTo)
-                        }
-                    }else if(origPiece.type == Type.bishop){
-                        if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                            killPiece(origPiece,piece,xTo,yTo)
+                            movePiece(origPiece,xTo,yTo)
+                            turn = changeTurn(turn)
                         }
                     }else if(origPiece.type == Type.queen){
                         if(moveQueen(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                            killPiece(origPiece,piece,xTo,yTo)
+                            movePiece(origPiece,xTo,yTo)
+                            turn = changeTurn(turn)
                         }
-                    }
-                }else{
-                    return
-                }
-            }else{
-                if(origPiece.type == Type.pawn){
-                    if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
-                    }
-                }else if(origPiece.type == Type.rook){
-                    if(moveRook(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
-                    }
-                }else if(origPiece.type == Type.king){
-                    if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
-                    }
-                }else if(origPiece.type == Type.queen){
-                    if(moveQueen(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
-                    }
-                }else if(origPiece.type == Type.bishop){
-                    if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
-                    }
-                }else if(origPiece.type == Type.knight){
-                    if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
-                        movePiece(origPiece,xTo,yTo)
+                    }else if(origPiece.type == Type.bishop){
+                        if(moveBishop(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            movePiece(origPiece,xTo,yTo)
+                            turn = changeTurn(turn)
+                        }
+                    }else if(origPiece.type == Type.knight){
+                        if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
+                            movePiece(origPiece,xTo,yTo)
+                            turn = changeTurn(turn)
+                        }
                     }
                 }
             }
         }
     }
+     private fun changeTurn(current: Player): Player{
+         if(current == Player.white){
+             return Player.black
+         }else{
+             return Player.white
+         }
+     }
     private fun killPiece(movingPiece: Pieces, deadPiece: Pieces, xTo: Int, yTo: Int){
         piecebox.remove(deadPiece)
         piecebox.remove(movingPiece)
@@ -117,6 +169,16 @@ class Board {
         piecebox.remove(movingPiece)
         piecebox.add(Pieces(xTo,yTo,movingPiece.player,movingPiece.type,movingPiece.id))
     }
+     // promotion, all pieces will automatically convert to queen
+     private fun promotion(xTo: Int, yTo: Int, color: Player): Boolean{
+         if (color == Player.white && yTo==0){
+             return true
+         }
+         if (color == Player.black && yTo==7){
+             return true
+         }
+         return false
+     }
     // sees if pawn is able move forward
     private fun movePawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if (color == Player.white) {
