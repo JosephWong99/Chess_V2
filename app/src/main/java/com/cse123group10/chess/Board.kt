@@ -1,6 +1,5 @@
  package com.cse123group10.chess
 
- import android.util.Log
  import kotlin.math.abs
 
  // this module contains the chess logic portion of the code
@@ -54,14 +53,13 @@ class Board {
     }
     fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTon: Int){
         val origPiece = pieceAt(xOrig,yOrig)
+        // used to prevent pieces from going off the board
         var yTo: Int
         if (yTon < 0){
             yTo = 0
         }else{
             yTo = yTon
         }
-        Log.d(debug_TAG, "ljksahdflkjdash $xTo")
-        Log.d(debug_TAG, toString())
         if (origPiece != null){
             if(origPiece.player == turn){
                 val piece = pieceAt(xTo,yTo)
@@ -153,6 +151,7 @@ class Board {
             }
         }
     }
+     // keep track of which players turn it is
      private fun changeTurn(current: Player): Player{
          if(current == Player.white){
              return Player.black
@@ -160,6 +159,8 @@ class Board {
              return Player.white
          }
      }
+
+     // remove a piece a
     private fun killPiece(movingPiece: Pieces, deadPiece: Pieces, xTo: Int, yTo: Int){
         piecebox.remove(deadPiece)
         piecebox.remove(movingPiece)
@@ -221,13 +222,14 @@ class Board {
         }
         return false
     }
-    //
+    // checks if rook can move to designated position
     private  fun moveRook(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
-        if(xOrig == xTo || yOrig == yTo){
+        if(HorizontalCheck(xOrig,xTo,yOrig,yTo,color) || VerticalCheck(xOrig,xTo,yOrig,yTo,color)){
             return true
         }
         return false
     }
+     // checks if bishop can move
     private fun moveBishop(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if(xOrig==xTo||yOrig==yTo){
             return false
@@ -235,6 +237,41 @@ class Board {
         var deltaX = abs(xOrig-xTo)
         var deltaY = abs(yOrig-yTo)
         if(deltaX==deltaY){
+            if(deltaX == 1){
+                return true
+            }
+            // north west
+            if(xOrig-xTo>0&&yOrig-yTo>0) {
+                for (i in 1..(deltaX-1)) {
+                    if (pieceAt(xOrig - i, yOrig - i) != null) {
+                        return false
+                    }
+                }
+            }
+            // north east
+            if(xOrig-xTo<0&&yOrig-yTo>0) {
+                for (i in 1..(deltaX-1)) {
+                    if (pieceAt(xOrig + i, yOrig - i) != null) {
+                        return false
+                    }
+                }
+            }
+            // south west
+            if(xOrig-xTo>0&&yOrig-yTo<0) {
+                for (i in 1..(deltaX-1)) {
+                    if (pieceAt(xOrig - i, yOrig + i) != null) {
+                        return false
+                    }
+                }
+            }
+            // south east
+            if(xOrig-xTo<0&&yOrig-yTo<0) {
+                for (i in 1..(deltaX-1)) {
+                    if (pieceAt(xOrig + i, yOrig + i) != null) {
+                        return false
+                    }
+                }
+            }
             return true
         }
         return false
@@ -257,6 +294,37 @@ class Board {
         }
         return false
     }
+
+     private fun HorizontalCheck (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
+         if (xOrig != xTo) {
+             return false
+         }
+         val gap = abs(yOrig - yTo) - 1
+         if (gap == 0) return true
+         for (i in 1..gap){
+             val nextCol = if (yTo > yOrig) yOrig + i else yOrig - i
+             if (pieceAt(xOrig, nextCol ) != null) {
+                 return false
+             }
+         }
+         return true
+
+     }
+
+     private fun VerticalCheck (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
+         if (yOrig != yTo) {
+             return false
+         }
+         val gap = abs(xOrig - xTo) - 1
+         if (gap == 0) return true
+         for (i in 1..gap){
+             val nextRow = if (xTo > xOrig) xOrig + i else xOrig - i
+             if (pieceAt(nextRow, yOrig) != null) {
+                 return false
+             }
+         }
+         return true
+     }
 
     // creates a printout of the board in the terminal(logcat)
     override fun toString(): String {
