@@ -1,11 +1,10 @@
  package com.cse123group10.chess
 
+ import android.util.Log
  import kotlin.math.abs
 /*TODO
-  Add if king in check, make sure king isn't in check on next move
-  add message for when king in check/mate
-  add castling
-  add en passant
+  add castling - spencer
+  add en passant - spencer
   */
 
 
@@ -15,6 +14,10 @@ class Board {
     // creates all pieces
     var piecebox = mutableSetOf<Pieces>()
      var turn: Player = Player.white
+     var  whiteKingX = 4
+     var whiteKingY = 7
+     var blackKingX = 4
+     var blackKingY = 0
     //
     init{
         piecebox.removeAll(piecebox)
@@ -91,6 +94,13 @@ class Board {
                         }else if(origPiece.type == Type.king){
                             if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
                                 killPiece(origPiece,piece,xTo,yTo)
+                                if(origPiece.player == Player.white){
+                                    whiteKingX = xTo
+                                    whiteKingY = yTo
+                                }else{
+                                    blackKingX = xTo
+                                    blackKingY = yTo
+                                }
                                 turn = changeTurn(turn)
                             }
                         }else if(origPiece.type == Type.knight){
@@ -109,9 +119,20 @@ class Board {
                                 turn = changeTurn(turn)
                             }
                         }
+                        // check if king is in danger after a piece is moved
+                        if(origPiece.player == Player.white){
+                            if(kingCheck(blackKingX,blackKingY,Player.black)){
+                                checkMoveFlag = 1
+                            }
+                        }else{
+                            if(kingCheck(whiteKingX,whiteKingY,Player.white)){
+                                checkMoveFlag = 1
+                            }
+                        }
                     }else{
                         return
                     }
+            // moving to a blank square
                 }else{
                     if(origPiece.type == Type.pawn){
                         if(movePawn(xOrig,yOrig,xTo,yTo,origPiece.player)){
@@ -136,6 +157,13 @@ class Board {
                     }else if(origPiece.type == Type.king){
                         if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
                             movePiece(origPiece,xTo,yTo)
+                            if(origPiece.player == Player.white){
+                                whiteKingX = xTo
+                                whiteKingY = yTo
+                            }else{
+                                blackKingX = xTo
+                                blackKingY = yTo
+                            }
                             turn = changeTurn(turn)
                         }
                     }else if(origPiece.type == Type.queen){
@@ -152,6 +180,16 @@ class Board {
                         if(moveKnight(xOrig,yOrig,xTo,yTo,origPiece.player)){
                             movePiece(origPiece,xTo,yTo)
                             turn = changeTurn(turn)
+                        }
+                    }
+                    // check if king is in danger after a piece is moved
+                    if(origPiece.player == Player.white){
+                        if(kingCheck(blackKingX,blackKingY,Player.black)){
+                            checkMoveFlag = 1
+                        }
+                    }else{
+                        if(kingCheck(whiteKingX,whiteKingY,Player.white)){
+                            checkMoveFlag = 1
                         }
                     }
                 }
@@ -260,6 +298,9 @@ class Board {
         if((xOrig+1==xTo || xOrig-1 == xTo || xOrig == xTo) && (yOrig+1==yTo||yOrig-1==yTo || yOrig == yTo)){
             if(!kingCheck(xTo,yTo,color)){
                 return true
+            }else{
+                Log.d(debug_TAG,"king in check")
+                checkFlag = 1;
             }
         }
         return false
@@ -354,10 +395,10 @@ class Board {
          if(piece != null){
              return true
          }
-//         piece = kingCheckL(x,y,color)
-//         if(piece != null){
-//             return true
-//         }
+         piece = kingCheckL(x,y,color)
+         if(piece != null){
+             return true
+         }
 //         piece = kingCheckPawn(x,y,color)
 //         if(piece != null){
 //             return true
@@ -490,6 +531,55 @@ class Board {
      }
      // returns a knight that is able to attack the king
      private  fun  kingCheckL(x: Int, y: Int, color: Player ): Pieces?{
+         var piece = pieceAt(x+2,y+1)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x+2,y-1)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x-2,y+1)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x-2,y-1)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x+1,y+2)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x+1,y-2)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x-1,y+2)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+         piece = pieceAt(x-1,y-2)
+         if(piece!=null) {
+             if (piece.type == Type.knight && color != piece.player) {
+                 return piece
+             }
+         }
+
          return null
      }
      // returns a pawn that is able to attack the king

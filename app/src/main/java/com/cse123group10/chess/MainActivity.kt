@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 const val debug_TAG = "MainActivity"
+var checkFlag = 0
+var checkMoveFlag = 0
+private const val checkMessage = "King In Check"
+const val duration = Toast.LENGTH_LONG
 
 class MainActivity : AppCompatActivity(), ChessInterface {
-
     var boardModel = Board()
     private lateinit var boardView: ChessboardView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,5 +44,15 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     override fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTo: Int) {
         boardModel.movePiece(xOrig, yOrig, xTo, yTo)
         boardView.invalidate()
+        if(checkFlag == 1){
+            checkFlag = 0
+            findViewById<TextView>(R.id.editTextTextPersonName).text = "Can't move there, King will be in check"
+
+        }
+        if(checkMoveFlag == 1){
+            checkMoveFlag = 0
+            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
+
+        }
     }
 }
