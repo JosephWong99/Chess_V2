@@ -12,6 +12,12 @@
 // it handles placing and mocing pieces
 class Board {
     // creates all pieces
+     var whiterookr = 0
+     var whiterookl = 0
+     var blackrookl = 0
+     var blackrookr = 0
+     var blackkingmove = 0
+     var whitekingmove = 0
     var piecebox = mutableSetOf<Pieces>()
      var turn: Player = Player.white
      var  whiteKingX = 4
@@ -270,6 +276,22 @@ class Board {
     // checks if rook can move to designated position
     private  fun moveRook(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if(HorizontalCheck(xOrig,xTo,yOrig,yTo,color) || VerticalCheck(xOrig,xTo,yOrig,yTo,color)){
+            if(color == Player.white && xOrig == 7 && yOrig == 7){
+                whiterookr = 1
+                return true
+            }
+            else if(color == Player.white && xOrig == 7 && yOrig ==0){
+                whiterookl = 1
+                return true
+            }
+            else if(color == Player.black && xOrig == 0 && yOrig == 7){
+                blackrookr = 1
+                return true
+            }
+            else if(color == Player.black && xOrig == 0 && yOrig == 0){
+                blackrookl = 1
+                return true
+            }
             return true
         }
         return false
@@ -294,17 +316,35 @@ class Board {
     private fun moveQueen(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         return moveBishop(xOrig,yOrig,xTo,yTo,color)||moveRook(xOrig,yOrig,xTo,yTo,color)
     }
-    private fun moveKing(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
-        if((xOrig+1==xTo || xOrig-1 == xTo || xOrig == xTo) && (yOrig+1==yTo||yOrig-1==yTo || yOrig == yTo)){
-            if(!kingCheck(xTo,yTo,color)){
-                return true
-            }else{
-                Log.d(debug_TAG,"king in check")
-                checkFlag = 1;
-            }
-        }
-        return false
-    }
+     private fun moveKing(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
+         if((xOrig+1==xTo || xOrig-1 == xTo || xOrig == xTo) && (yOrig+1==yTo||yOrig-1==yTo || yOrig == yTo)){
+             if(!kingCheck(xTo,yTo,color)){
+                 if (color == Player.white){
+                     whitekingmove = 1
+                     return true
+                 }
+                 else if (color == Player.black){
+                     blackkingmove = 1
+                     return true
+                 }
+
+             }else{
+                 Log.d(debug_TAG,"king in check")
+                 checkFlag = 1;
+             }
+         }
+         if(castling(xOrig, xTo, yOrig, yTo, color)){
+             if(!kingCheck(xTo,yTo,color)){
+                 return true
+             }else{
+                 Log.d(debug_TAG,"king in check")
+                 checkFlag = 1;
+             }
+         }
+
+
+         return false
+     }
     private fun moveKnight(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if((xOrig+2==xTo || xOrig-2==xTo) && (yOrig+1==yTo||yOrig-1==yTo)){
             return true
@@ -380,6 +420,61 @@ class Board {
          }
          return true
      }
+     private fun checkCastlingl (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
+         //have three variables that check your king move, your rook moves, king cant be in check
+         // no piece can be between king and rook
+         if (color == Player.white) {
+             if (HorizontalCheck(7,7,4,1,color)) {
+                 if ((whitekingmove == 1) && (whiterookl == 1))
+                     return false
+             }
+         }
+         if (color == Player.black){
+             if (HorizontalCheck(0,0,4,1,color)) {
+                 if ((blackkingmove == 1) && (blackrookl == 1))
+                     return false
+             }
+         }
+         return true
+     }
+
+     private fun checkCastlingr (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
+         if (color == Player.white) {
+             if (HorizontalCheck(7,7,4,6,color)) {
+                 if ((whitekingmove == 1) && (whiterookr == 1))
+                     return false
+             }
+         }
+         if (color == Player.black){
+             if (HorizontalCheck(0,0,4,6,color)) {
+                 if ((blackkingmove == 1) && (blackrookr == 1))
+                     return false
+             }
+         }
+         return true
+     }
+
+     private fun castling (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
+         if (color == Player.white){
+             if  (yOrig+2==yTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
+
+                 return true
+             }
+             if (yOrig-2==yTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
+                 return true
+             }
+         }
+         if (color == Player.black){
+             if (yOrig+2==yTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
+                 return true
+             }
+             if (yOrig-2==yTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
+                 return true
+             }
+         }
+         return false
+     }
+
      // assumes valid king move, checks if king is in danger(mate)
      // returns true if king is in mate
     private fun kingCheck(x: Int, y: Int, color: Player ): Boolean{
