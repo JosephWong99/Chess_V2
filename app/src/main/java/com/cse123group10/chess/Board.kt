@@ -164,7 +164,11 @@ class Board {
                                 }else {
                                     piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.blackqueen))
                                 }
-                            }else{
+                            }
+                            if(enPasssant(xOrig, yOrig, xTo, yTo, origPiece.player)){
+                                killPiece(origPiece, piece, xTo, yTo)
+                                turn = changeTurn(turn)
+                            } else{
                                 movePiece(origPiece,xTo,yTo)
                             }
                             turn = changeTurn(turn)
@@ -267,6 +271,38 @@ class Board {
          }
          return false
      }
+
+     private fun enPasssant (xOrig: Int, yOrig: Int, xTo: Int, yTo: Int, color: Player): Boolean {
+         //Testing en passant
+         if (color == Player.white) {
+             val piece = pieceAt(xOrig + 1, yOrig)
+             val piece2 = pieceAt(xOrig - 1, yOrig)
+             if (yOrig == 3 && piece != null && piece.type==Type.pawn && color != piece.player) {
+                 if (yTo == 2 && xOrig + 1 == xTo) {
+                     return true
+                 }
+             } else if (yOrig == 3 && piece2 != null && piece2.type==Type.pawn && color != piece2.player) {
+                 if (yTo == 2 && xOrig - 1 == xTo) {
+                     return true
+                 }
+             }
+         }
+         if (color == Player.black) {
+             val piece = pieceAt(xOrig + 1, yOrig)
+             val piece2 = pieceAt(xOrig - 1, yOrig)
+             if (yOrig == 4 && piece != null && piece.type==Type.pawn && color != piece.player) {
+                 if (yTo == 5 && xOrig + 1 == xTo) {
+                     return true
+                 }
+             } else if (yOrig == 4 && piece2 != null && piece2.type==Type.pawn && color != piece2.player) {
+                 if (yTo == 5 && xOrig - 1 == xTo) {
+                     return true
+                 }
+             }
+         }
+         return false
+     }
+
     private fun movePawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if (color == Player.white) {
             if(yOrig == 6 && xOrig==xTo){
