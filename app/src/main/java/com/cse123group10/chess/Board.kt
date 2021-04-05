@@ -18,9 +18,11 @@ class Board {
      var blackrookr = 0
      var blackkingmove = 0
      var whitekingmove = 0
+     var castleMoveWhite = 0
+     var castleMoveBlack = 0
     var piecebox = mutableSetOf<Pieces>()
      var turn: Player = Player.white
-     var  whiteKingX = 4
+     var whiteKingX = 4
      var whiteKingY = 7
      var blackKingX = 4
      var blackKingY = 0
@@ -33,6 +35,18 @@ class Board {
     fun startUp(){
         piecebox.removeAll(piecebox)
         turn = Player.white
+        whiteKingX = 4
+        whiteKingY = 7
+        blackKingX = 4
+        blackKingY = 0
+        whiterookr = 0
+        whiterookl = 0
+        blackrookl = 0
+        blackrookr = 0
+        blackkingmove = 0
+        whitekingmove = 0
+        castleMoveWhite = 0
+        castleMoveBlack = 0
         // add white pieces
         piecebox.add(Pieces(0,7,Player.white, Type.rook,R.drawable.whiterook))
         piecebox.add(Pieces(7,7,Player.white, Type.rook,R.drawable.whiterook))
@@ -163,6 +177,28 @@ class Board {
                     }else if(origPiece.type == Type.king){
                         if(moveKing(xOrig,yOrig,xTo,yTo,origPiece.player)){
                             movePiece(origPiece,xTo,yTo)
+                            //
+                            if(xTo == 2 && origPiece.player == Player.white){
+                                if(castleMoveWhite == 1){
+                                    castleMoveWhite = 2
+                                    pieceAt(0,7)?.let { movePiece(it,3,7) }
+                                }
+                            }else if(xTo == 2 && origPiece.player == Player.black){
+                                if(castleMoveBlack == 1){
+                                    castleMoveBlack = 2
+                                    pieceAt(0,0)?.let { movePiece(it,3,0) }
+                                }
+                            } else if(xTo == 6 && origPiece.player == Player.white){
+                                if(castleMoveWhite == 1){
+                                    castleMoveWhite = 2
+                                    pieceAt(7,7)?.let { movePiece(it,5,7) }
+                                }
+                            } else if(xTo == 6 && origPiece.player == Player.black){
+                                if(castleMoveBlack == 1){
+                                    castleMoveBlack = 2
+                                    pieceAt(7,0)?.let { movePiece(it,5,0) }
+                                }
+                            }
                             if(origPiece.player == Player.white){
                                 whiteKingX = xTo
                                 whiteKingY = yTo
@@ -231,7 +267,6 @@ class Board {
          }
          return false
      }
-    // sees if pawn is able move forward
     private fun movePawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if (color == Player.white) {
             if(yOrig == 6 && xOrig==xTo){
@@ -256,7 +291,6 @@ class Board {
         }
         return false
     }
-    // checks to see if pawn is able to attack
     private fun attackPawn(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if (color == Player.white) {
             if(xOrig-1==xTo || xOrig+1==xTo){
@@ -273,7 +307,6 @@ class Board {
         }
         return false
     }
-    // checks if rook can move to designated position
     private  fun moveRook(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if(HorizontalCheck(xOrig,xTo,yOrig,yTo,color) || VerticalCheck(xOrig,xTo,yOrig,yTo,color)){
             if(color == Player.white && xOrig == 7 && yOrig == 7){
@@ -296,7 +329,6 @@ class Board {
         }
         return false
     }
-     // checks if bishop can move
     private fun moveBishop(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
         if(xOrig==xTo||yOrig==yTo){
             return false
@@ -335,14 +367,17 @@ class Board {
          }
          if(castling(xOrig, xTo, yOrig, yTo, color)){
              if(!kingCheck(xTo,yTo,color)){
+                 if(color == Player.white){
+                     castleMoveWhite = 1
+                 }else if(color == Player.black){
+                     castleMoveBlack = 1
+                 }
                  return true
              }else{
                  Log.d(debug_TAG,"king in check")
                  checkFlag = 1;
              }
          }
-
-
          return false
      }
     private fun moveKnight(xOrig: Int, yOrig: Int, xTo: Int,yTo: Int, color: Player): Boolean{
@@ -424,13 +459,13 @@ class Board {
          //have three variables that check your king move, your rook moves, king cant be in check
          // no piece can be between king and rook
          if (color == Player.white) {
-             if (HorizontalCheck(7,7,4,1,color)) {
+             if (HorizontalCheck(0,3,7,7,color)) {
                  if ((whitekingmove == 1) && (whiterookl == 1))
                      return false
              }
          }
          if (color == Player.black){
-             if (HorizontalCheck(0,0,4,1,color)) {
+             if (HorizontalCheck(0,3,0,0,color)) {
                  if ((blackkingmove == 1) && (blackrookl == 1))
                      return false
              }
@@ -440,13 +475,13 @@ class Board {
 
      private fun checkCastlingr (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (color == Player.white) {
-             if (HorizontalCheck(7,7,4,6,color)) {
+             if (HorizontalCheck(7,5,7,7,color)) {
                  if ((whitekingmove == 1) && (whiterookr == 1))
                      return false
              }
          }
          if (color == Player.black){
-             if (HorizontalCheck(0,0,4,6,color)) {
+             if (HorizontalCheck(7,5,0,0,color)) {
                  if ((blackkingmove == 1) && (blackrookr == 1))
                      return false
              }
@@ -456,19 +491,18 @@ class Board {
 
      private fun castling (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (color == Player.white){
-             if  (yOrig+2==yTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
-
+             if  (xOrig+2==xTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
                  return true
              }
-             if (yOrig-2==yTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
+             if (xOrig-2==xTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
                  return true
              }
          }
          if (color == Player.black){
-             if (yOrig+2==yTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
+             if (xOrig+2==xTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
                  return true
              }
-             if (yOrig-2==yTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
+             if (xOrig-2==xTo && checkCastlingl(xOrig, xTo, yOrig, yTo, color)) {
                  return true
              }
          }
