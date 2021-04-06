@@ -3,7 +3,7 @@
  import android.util.Log
  import kotlin.math.abs
 /*TODO
-  add en passant - spencer
+  communication
   */
 
 
@@ -163,13 +163,12 @@ class Board {
                                 }else {
                                     piecebox.add(Pieces(xTo,yTo,origPiece.player,Type.queen,R.drawable.blackqueen))
                                 }
-                            }
-                            if(enPasssant(xOrig, yOrig, xTo, yTo, origPiece.player)){
-                                killPiece(origPiece, piece, xTo, yTo)
-                                turn = changeTurn(turn)
-                            } else{
+                            }else{
                                 movePiece(origPiece,xTo,yTo)
                             }
+                            turn = changeTurn(turn)
+                        }
+                        if(enPasssant(xOrig, yOrig, xTo, yTo, origPiece.player)){
                             turn = changeTurn(turn)
                         }
                     }else if(origPiece.type == Type.rook){
@@ -278,10 +277,14 @@ class Board {
              val piece2 = pieceAt(xOrig - 1, yOrig)
              if (yOrig == 3 && piece != null && piece.type==Type.pawn && color != piece.player) {
                  if (yTo == 2 && xOrig + 1 == xTo) {
+                     pieceAt(xOrig,yOrig)?.let { movePiece(it,xTo,yTo) }
+                     piecebox.remove(piece)
                      return true
                  }
              } else if (yOrig == 3 && piece2 != null && piece2.type==Type.pawn && color != piece2.player) {
                  if (yTo == 2 && xOrig - 1 == xTo) {
+                     pieceAt(xOrig,yOrig)?.let { movePiece(it,xTo,yTo) }
+                     piecebox.remove(piece2)
                      return true
                  }
              }
@@ -291,10 +294,14 @@ class Board {
              val piece2 = pieceAt(xOrig - 1, yOrig)
              if (yOrig == 4 && piece != null && piece.type==Type.pawn && color != piece.player) {
                  if (yTo == 5 && xOrig + 1 == xTo) {
+                     pieceAt(xOrig,yOrig)?.let { movePiece(it,xTo,yTo) }
+                     piecebox.remove(piece)
                      return true
                  }
              } else if (yOrig == 4 && piece2 != null && piece2.type==Type.pawn && color != piece2.player) {
                  if (yTo == 5 && xOrig - 1 == xTo) {
+                     pieceAt(xOrig,yOrig)?.let { movePiece(it,xTo,yTo) }
+                     piecebox.remove(piece2)
                      return true
                  }
              }
