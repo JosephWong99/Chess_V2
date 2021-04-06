@@ -3,7 +3,6 @@
  import android.util.Log
  import kotlin.math.abs
 /*TODO
-  add castling - spencer
   add en passant - spencer
   */
 
@@ -455,6 +454,7 @@ class Board {
          }
          return true
      }
+     // created by spencer
      private fun checkCastlingl (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          //have three variables that check your king move, your rook moves, king cant be in check
          // no piece can be between king and rook
@@ -472,7 +472,7 @@ class Board {
          }
          return true
      }
-
+     // created by spencer
      private fun checkCastlingr (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (color == Player.white) {
              if (HorizontalCheck(7,5,7,7,color)) {
@@ -488,7 +488,7 @@ class Board {
          }
          return true
      }
-
+     // created by spencer
      private fun castling (xOrig: Int, xTo: Int, yOrig: Int, yTo: Int, color: Player ): Boolean {
          if (color == Player.white){
              if  (xOrig+2==xTo && checkCastlingr(xOrig, xTo, yOrig, yTo, color)) {
@@ -508,7 +508,6 @@ class Board {
          }
          return false
      }
-
      // assumes valid king move, checks if king is in danger(mate)
      // returns true if king is in mate
     private fun kingCheck(x: Int, y: Int, color: Player ): Boolean{
