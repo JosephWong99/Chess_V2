@@ -7,6 +7,10 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.io.PrintWriter
+import java.net.Socket
+import java.util.*
+import java.util.concurrent.Executors
 
 const val debug_TAG = "MainActivity"
 var checkFlag = 0
@@ -34,6 +38,19 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         findViewById<Button>(R.id.Reset).setOnClickListener {
             boardModel.startUp()
             boardView.invalidate()
+        }
+        findViewById<Button>(R.id.Connect).setOnClickListener {
+            Executors.newSingleThreadExecutor().execute {
+                val socket = Socket("127.0.0.1",8942)
+                val scanner = Scanner(socket.getInputStream())
+                val writer = PrintWriter(socket.getOutputStream())
+                while(scanner.hasNextLine()){
+                    
+                }
+            }
+        }
+        findViewById<Button>(R.id.Host).setOnClickListener {
+
         }
     }
 
