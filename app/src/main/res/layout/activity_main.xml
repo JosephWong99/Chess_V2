@@ -40,7 +40,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+<<<<<<< Updated upstream
             android:layout_marginTop="8dp"
+=======
+            android:layout_marginTop="16dp"
+>>>>>>> Stashed changes
             android:text="@string/resetButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -60,13 +64,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
+<<<<<<< Updated upstream
             android:layout_marginTop="8dp"
+=======
+            android:layout_marginTop="16dp"
+>>>>>>> Stashed changes
             android:layout_marginEnd="48dp"
             android:text="@string/connectButton"
             app:layout_constraintEnd_toStartOf="@+id/Host"
             app:layout_constraintHorizontal_bias="0.666"
             app:layout_constraintStart_toEndOf="@+id/Reset"
             app:layout_constraintTop_toTopOf="parent" />
+<<<<<<< Updated upstream
+=======
+
+        <Button
+            android:id="@+id/Host"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/hostButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/editTextTextPersonName"
+            android:layout_width="378dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="16dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/textBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Connect" />
+>>>>>>> Stashed changes
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
