@@ -11,7 +11,7 @@
     <com.cse123group10.chess.ChessboardView
         android:id="@+id/chessboard_view"
         android:layout_width="match_parent"
-        android:layout_height="514dp">
+        android:layout_height="448dp">
 
     </com.cse123group10.chess.ChessboardView>
 
@@ -19,14 +19,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <EditText
+            android:id="@+id/editTextTextPersonName"
+            android:layout_width="378dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/textBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Connect"
+            android:autofillHints="" />
+
         <Button
             android:id="@+id/Reset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="8dp"
             android:text="@string/resetButton"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/Host"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/hostButton"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
@@ -34,36 +60,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="48dp"
             android:text="@string/connectButton"
             app:layout_constraintEnd_toStartOf="@+id/Host"
+            app:layout_constraintHorizontal_bias="0.666"
             app:layout_constraintStart_toEndOf="@+id/Reset"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/Host"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/hostButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/editTextTextPersonName"
-            android:layout_width="378dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="@string/textBox"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Connect" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
- </LinearLayout>
+</LinearLayout>

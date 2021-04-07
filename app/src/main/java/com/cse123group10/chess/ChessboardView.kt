@@ -13,7 +13,7 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
     private val lengthSquare: Int
         get() = (width-20)/8
     private val xStart = 10f
-    private val yStart = 250f
+    private val yStart = 100f
     private var pieceStartX = -1
     private var pieceStartY = -1
     // images taken from
