@@ -8,12 +8,12 @@
     android:layout_gravity="center"
     android:orientation="vertical">
 
-    <com.cse123group10.chess.ChessboardView
+    <com.example.shared.ChessboardView
         android:id="@+id/chessboard_view"
         android:layout_width="match_parent"
         android:layout_height="448dp">
 
-    </com.cse123group10.chess.ChessboardView>
+    </com.example.shared.ChessboardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
