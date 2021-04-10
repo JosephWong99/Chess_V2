@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.PrintWriter
+import java.net.ConnectException
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
@@ -21,12 +22,13 @@ const val duration = Toast.LENGTH_LONG
 class MainActivity : AppCompatActivity(), ChessInterface {
     var boardModel = Board()
     private lateinit var boardView: ChessboardView
+    private lateinit var connectButton: Button
+    private lateinit var socket: Socket
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // get size of screen for scalable baord size
         val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
         displayMetrics.widthPixels
         displayMetrics.heightPixels
         // draw board model in terminal
@@ -36,16 +38,40 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         boardView = findViewById<ChessboardView>(R.id.chessboard_view)
         boardView.boardInterface = this
         findViewById<Button>(R.id.Reset).setOnClickListener {
+            Log.d(debug_TAG, "reset pressed")
             boardModel.startUp()
             boardView.invalidate()
         }
-        findViewById<Button>(R.id.Connect).setOnClickListener {
+        connectButton = findViewById<Button>(R.id.Connect)
+        connectButton.setOnClickListener {
             Executors.newSingleThreadExecutor().execute {
-                val socket = Socket("127.0.0.1",8942)
-                val scanner = Scanner(socket.getInputStream())
-                val writer = PrintWriter(socket.getOutputStream())
-                while(scanner.hasNextLine()){
-                    
+                try {
+                    socket = Socket("10.0.0.18", 50029)// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
+                    Log.d(debug_TAG, "pressed")
+                    val scanner = Scanner(socket.getInputStream())
+                    val printWriter = PrintWriter(socket.getOutputStream(), true)
+                    //Log.d(debug_TAG, "${scanner.nextLine()}")
+                    Log.d(debug_TAG, "before hasnext() testing")
+                    if (scanner.hasNext()) {
+                        Log.d(debug_TAG, "can read")
+                    } else {
+                        Log.d(debug_TAG, "cant read")
+                    }
+                    Log.d(debug_TAG, "after hasnext() testing")
+                    while (scanner.hasNext()) {
+                        Log.d(debug_TAG, "get string")
+                        val moveString = scanner.next()
+                        Log.d(debug_TAG, "splitting")
+                        val move: List<Int> = moveString.split(",").map { it.toInt() }
+                        Log.d(debug_TAG, "String has been split")
+                        runOnUiThread {
+                            Log.d(debug_TAG, "move pice")
+                            movePiece(move[0], move[1], move[2], move[3])
+                            boardView.invalidate()
+                        }
+                    }
+                }catch(e: ConnectException){
+                    Log.d(debug_TAG, "failed connect")
                 }
             }
         }
