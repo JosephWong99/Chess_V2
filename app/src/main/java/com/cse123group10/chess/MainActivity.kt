@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // get size of screen for scalable baord size
+        // get size of screen for scalable board size
         val displayMetrics = DisplayMetrics()
         displayMetrics.widthPixels
         displayMetrics.heightPixels
@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         connectButton.setOnClickListener {
             Executors.newSingleThreadExecutor().execute {
                 try {
-                    socket = Socket("10.0.0.18", 50029)// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
+                    // Host should be personal computer IP address and port should be server port
+                    socket = Socket("192.168.1.78", 10000)// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
                     Log.d(debug_TAG, "pressed")
                     val scanner = Scanner(socket.getInputStream())
                     val printWriter = PrintWriter(socket.getOutputStream(), true)
