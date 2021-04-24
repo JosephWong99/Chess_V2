@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,10 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private lateinit var boardView: ChessboardView
     private lateinit var connectButton: Button
     private lateinit var socket: Socket
+    private lateinit var editText: EditText
+    var printWriter: PrintWriter? = null
+    private var server_move = false
+    private val ack_msg = "     ACK                                                                   "
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -43,36 +48,53 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             boardView.invalidate()
         }
         connectButton = findViewById<Button>(R.id.Connect)
+        editText = findViewById<EditText>(R.id.editTextTextPersonName)
         connectButton.setOnClickListener {
             Executors.newSingleThreadExecutor().execute {
                 try {
                     // Host should be personal computer IP address and port should be server port
-                    socket = Socket("192.168.1.78", 10000)// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
+                    var text = editText.text.toString()
+                    var ip: List<String> = text.split(":")
+                    socket = Socket("${ip[0]}", ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
                     Log.d(debug_TAG, "pressed")
                     val scanner = Scanner(socket.getInputStream())
-                    val printWriter = PrintWriter(socket.getOutputStream(), true)
-                    //Log.d(debug_TAG, "${scanner.nextLine()}")
-                    Log.d(debug_TAG, "before hasnext() testing")
-                    if (scanner.hasNext()) {
-                        Log.d(debug_TAG, "can read")
-                    } else {
-                        Log.d(debug_TAG, "cant read")
+                    if (printWriter == null) {
+                        printWriter = PrintWriter(socket.getOutputStream())
                     }
-                    Log.d(debug_TAG, "after hasnext() testing")
-                    while (scanner.hasNext()) {
-                        Log.d(debug_TAG, "get string")
-                        val moveString = scanner.next()
-                        Log.d(debug_TAG, "splitting")
-                        val move: List<Int> = moveString.split(",").map { it.toInt() }
-                        Log.d(debug_TAG, "String has been split")
-                        runOnUiThread {
-                            Log.d(debug_TAG, "move pice")
-                            movePiece(move[0], move[1], move[2], move[3])
-                            boardView.invalidate()
+                    printWriter!!.println("Group 10 CAPSTONE CHESS")
+                    printWriter!!.flush()
+                    printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0")
+                    printWriter!!.flush()
+                    while(true) {
+                        while (scanner.hasNext()) {
+                            server_move = true
+                            //scanner.nextLine()
+                            val moveString = scanner.nextLine()
+                            Log.d(debug_TAG, moveString)
+                            val move = moveString.split("(")
+                            val origX = move[1].split(",")
+                            val origY = origX[1].split(")")
+                            val toX = move[2].split(",")
+                            val toY = toX[1].split(")")
+                            runOnUiThread {
+                                movePiece(
+                                    origX[0].toInt(),
+                                    origY[0].toInt(),
+                                    toX[0].toInt(),
+                                    toY[0].toInt()
+                                )
+                                boardView.invalidate()
+                            }
+                            Executors.newSingleThreadExecutor().execute {
+                                printWriter!!.println(ack_msg)
+                                printWriter!!.flush()
+                                Log.d(debug_TAG, "YES DO IT")
+                            }
                         }
                     }
                 }catch(e: ConnectException){
                     Log.d(debug_TAG, "failed connect")
+                    findViewById<TextView>(R.id.editTextTextPersonName).text = "connection failed, input should be: ip:port"
                 }
             }
         }
@@ -85,18 +107,34 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         return boardModel.pieceAt(col,row)
     }
 
-    override fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTo: Int) {
-        boardModel.movePiece(xOrig, yOrig, xTo, yTo)
+    override fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTon: Int) {
+        boardModel.movePiece(xOrig, yOrig, xTo, yTon)
         boardView.invalidate()
-        if(checkFlag == 1){
-            checkFlag = 0
-            findViewById<TextView>(R.id.editTextTextPersonName).text = "Can't move there, King will be in check"
-
-        }
-        if(checkMoveFlag == 1){
-            checkMoveFlag = 0
-            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
-
+//        if(checkFlag == 1){
+//            checkFlag = 0
+//            findViewById<TextView>(R.id.editTextTextPersonName).text = "Can't move there, King will be in check"
+//
+//        }
+//        if(checkMoveFlag == 1){
+//            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
+//        }
+        // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
+            val moveStr : String =
+                "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                                                                                                                   "
+            Log.d(debug_TAG, "pls work")
+        if(!server_move) {
+            server_move = false
+            Executors.newSingleThreadExecutor().execute {
+                Log.d(debug_TAG, moveStr)
+                printWriter!!.println(moveStr)
+                printWriter!!.flush()
+            }
+        }else {
+            Executors.newSingleThreadExecutor().execute {
+                Log.d(debug_TAG, "ACK SENDING IT")
+                printWriter!!.println(ack_msg)
+                printWriter!!.flush()
+            }
         }
     }
 }

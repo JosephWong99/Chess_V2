@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Chess</string>
     <string name="resetButton">Reset</string>
-    <string name="textBox">Host/IP, Enter CPU for computer</string>
+    <string name="textBox">Host/IP(IP:Port), Enter CPU for computer</string>
+    <string name="hardIP">192.168.56.1:50055</string>
     <string name="connectButton">LAN</string>
     <string name="hostButton">Online</string>
+
 </resources>
