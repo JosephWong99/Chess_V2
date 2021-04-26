@@ -3,6 +3,7 @@ package com.cse123group10.chess
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Gravity
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -12,6 +13,7 @@ import java.net.ConnectException
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
+
 
 const val debug_TAG = "MainActivity"
 var checkFlag = 0
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     var boardModel = Board()
     private lateinit var boardView: ChessboardView
     private lateinit var connectButton: Button
+    private lateinit var hostButton: Button
     private lateinit var socket: Socket
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,16 +50,16 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             Executors.newSingleThreadExecutor().execute {
                 try {
                     // Host should be personal computer IP address and port should be server port
-                    socket = Socket("192.168.1.78", 10000)// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
+                    socket = Socket("192.168.1.78", 5050) // 10.0.0.1 or 127.0.0.1 or 10.0.0.18
                     Log.d(debug_TAG, "pressed")
                     val scanner = Scanner(socket.getInputStream())
-                    val printWriter = PrintWriter(socket.getOutputStream(), true)
+//                    val printWriter = PrintWriter(socket.getOutputStream(), true)
                     //Log.d(debug_TAG, "${scanner.nextLine()}")
                     Log.d(debug_TAG, "before hasnext() testing")
                     if (scanner.hasNext()) {
                         Log.d(debug_TAG, "can read")
                     } else {
-                        Log.d(debug_TAG, "cant read")
+                        Log.d(debug_TAG, "can't read")
                     }
                     Log.d(debug_TAG, "after hasnext() testing")
                     while (scanner.hasNext()) {
@@ -66,23 +69,60 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         val move: List<Int> = moveString.split(",").map { it.toInt() }
                         Log.d(debug_TAG, "String has been split")
                         runOnUiThread {
-                            Log.d(debug_TAG, "move pice")
+                            Log.d(debug_TAG, "move piece")
                             movePiece(move[0], move[1], move[2], move[3])
                             boardView.invalidate()
                         }
                     }
-                }catch(e: ConnectException){
+                } catch (e: ConnectException) {
                     Log.d(debug_TAG, "failed connect")
                 }
             }
         }
-        findViewById<Button>(R.id.Host).setOnClickListener {
 
+        hostButton = findViewById<Button>(R.id.Host)
+        findViewById<Button>(R.id.Host).setOnClickListener {
+            Executors.newSingleThreadExecutor().execute {
+                try {
+                    // Host should be personal computer IP address and port should be server port (5050)
+                    socket = Socket("192.168.1.78", 5050)
+                    Log.d(debug_TAG, "pressed")
+                    val scanner = Scanner(socket.getInputStream())
+//                    val printWriter = PrintWriter(socket.getOutputStream(), true)
+                    socket.outputStream.write("Group 10 CAPSTONE CHESS".toByteArray()) // Sends data to socket
+                    socket.outputStream.write("True".toByteArray())
+                    val txtBoxtxt = (findViewById<TextView>(R.id.editTextTextPersonName).text).toString()
+                    socket.outputStream.write(txtBoxtxt.toByteArray())
+                    socket.outputStream.write("0".toByteArray())
+                    //Log.d(debug_TAG, "${scanner.nextLine()}")
+                    Log.d(debug_TAG, "before hasnext() testing")
+                    if (scanner.hasNext()) {
+                        Log.d(debug_TAG, "can read")
+                    } else {
+                        Log.d(debug_TAG, "can't read")
+                    }
+                    Log.d(debug_TAG, "after hasnext() testing")
+                    while (scanner.hasNext()) {
+                        Log.d(debug_TAG, "get string")
+                        val moveString = scanner.next()
+                        Log.d(debug_TAG, "splitting")
+                        val move: List<Int> = moveString.split(",").map { it.toInt() }
+                        Log.d(debug_TAG, "String has been split")
+                        runOnUiThread {
+                            Log.d(debug_TAG, "move piece")
+                            movePiece(move[0], move[1], move[2], move[3])
+                            boardView.invalidate()
+                        }
+                    }
+                } catch (e: ConnectException) {
+                    Log.d(debug_TAG, "failed connect")
+                }
+            }
         }
     }
 
     override fun pieceAt(col: Int, row: Int): Pieces? {
-        return boardModel.pieceAt(col,row)
+        return boardModel.pieceAt(col, row)
     }
 
     override fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTo: Int) {
