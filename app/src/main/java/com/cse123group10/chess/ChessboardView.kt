@@ -3,7 +3,6 @@ package com.cse123group10.chess
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -57,7 +56,7 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
                 var pieceGotoX = ((event.x-xStart)/lengthSquare).toInt()
                 var pieceGotoY = ((event.y-yStart)/lengthSquare).toInt()
                 boardInterface?.movePiece(pieceStartX,pieceStartY,pieceGotoX,pieceGotoY)
-                Log.d(debug_TAG,"($pieceStartX,$pieceStartY)->($pieceGotoX,$pieceGotoY)")
+                //Log.d(debug_TAG,"($pieceStartX,$pieceStartY)->($pieceGotoX,$pieceGotoY)")
                 pieceStartX = -1
                 pieceStartY = -1
 

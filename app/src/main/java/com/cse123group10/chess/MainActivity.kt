@@ -26,9 +26,9 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private lateinit var connectButton: Button
     private lateinit var socket: Socket
     private lateinit var editText: EditText
-    var printWriter: PrintWriter? = null
-    private var server_move = false
-    private val ack_msg = "     ACK                                                                   "
+    private var printWriter: PrintWriter? = null
+    private val ack_msg = "ACK                                                                        "
+    var first = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         displayMetrics.widthPixels
         displayMetrics.heightPixels
         // draw board model in terminal
-        Log.d(debug_TAG, "$boardModel")
+        //Log.d(debug_TAG, "$boardModel")
         // create a interface so that there is only one board model to be able to pass information
         // from terminal model to screen
         boardView = findViewById<ChessboardView>(R.id.chessboard_view)
@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     var text = editText.text.toString()
                     var ip: List<String> = text.split(":")
                     socket = Socket("${ip[0]}", ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
-                    Log.d(debug_TAG, "pressed")
                     val scanner = Scanner(socket.getInputStream())
                     if (printWriter == null) {
                         printWriter = PrintWriter(socket.getOutputStream())
@@ -65,11 +64,12 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     printWriter!!.flush()
                     printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0")
                     printWriter!!.flush()
-                    while(true) {
+                    while(true){
                         while (scanner.hasNext()) {
-                            server_move = true
-                            //scanner.nextLine()
+                            Log.d(debug_TAG,"SCANNER READING FROM SOCKET")
+                            scanner.nextLine()
                             val moveString = scanner.nextLine()
+                            Log.d(debug_TAG, "RECIEVED MSG:")
                             Log.d(debug_TAG, moveString)
                             val move = moveString.split("(")
                             val origX = move[1].split(",")
@@ -84,11 +84,6 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                                     toY[0].toInt()
                                 )
                                 boardView.invalidate()
-                            }
-                            Executors.newSingleThreadExecutor().execute {
-                                printWriter!!.println(ack_msg)
-                                printWriter!!.flush()
-                                Log.d(debug_TAG, "YES DO IT")
                             }
                         }
                     }
@@ -120,21 +115,17 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
             val moveStr : String =
-                "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                                                                                                                   "
-            Log.d(debug_TAG, "pls work")
-        if(!server_move) {
-            server_move = false
-            Executors.newSingleThreadExecutor().execute {
-                Log.d(debug_TAG, moveStr)
-                printWriter!!.println(moveStr)
-                printWriter!!.flush()
-            }
-        }else {
-            Executors.newSingleThreadExecutor().execute {
-                Log.d(debug_TAG, "ACK SENDING IT")
-                printWriter!!.println(ack_msg)
-                printWriter!!.flush()
-            }
+                "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
+        printWriter.let {
+                Executors.newSingleThreadExecutor().execute {
+                    Log.d(debug_TAG, moveStr)
+                    if(!first) {
+                        it?.println(ack_msg)
+                    }
+                    first = false
+                    it?.println(moveStr)
+                    it?.flush()
+                }
         }
     }
 }
