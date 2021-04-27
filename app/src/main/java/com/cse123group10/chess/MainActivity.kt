@@ -53,9 +53,9 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             Executors.newSingleThreadExecutor().execute {
                 try {
                     // Host should be personal computer IP address and port should be server port
-                    var text = editText.text.toString()
-                    var ip: List<String> = text.split(":")
-                    socket = Socket("${ip[0]}", ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
+                    val text = editText.text.toString()
+                    val ip: List<String> = text.split(":")
+                    socket = Socket(ip[0], ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
                     val scanner = Scanner(socket.getInputStream())
                     if (printWriter == null) {
                         printWriter = PrintWriter(socket.getOutputStream())
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             Log.d(debug_TAG,"SCANNER READING FROM SOCKET")
                             scanner.nextLine()
                             val moveString = scanner.nextLine()
-                            Log.d(debug_TAG, "RECIEVED MSG:")
+                            Log.d(debug_TAG, "RECEIVED MSG:")
                             Log.d(debug_TAG, moveString)
                             val move = moveString.split("(")
                             val origX = move[1].split(",")
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
-            val moveStr : String =
+            val moveStr =
                 "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
         printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
