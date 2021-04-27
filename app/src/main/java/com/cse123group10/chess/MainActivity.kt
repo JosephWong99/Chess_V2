@@ -53,17 +53,10 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             Executors.newSingleThreadExecutor().execute {
                 try {
                     // Host should be personal computer IP address and port should be server port
-<<<<<<< HEAD
-                    var text = editText.text.toString()
-                    var ip: List<String> = text.split(":")
-                    socket = Socket("${ip[0]}", ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
-                    var scanner = Scanner(socket.getInputStream())
-=======
                     val text = editText.text.toString()
                     val ip: List<String> = text.split(":")
                     socket = Socket(ip[0], ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
                     val scanner = Scanner(socket.getInputStream())
->>>>>>> fedf44a4134be8902076e5bb61378aa2faf209b1
                     if (printWriter == null) {
                         printWriter = PrintWriter(socket.getOutputStream())
                     }
@@ -73,7 +66,6 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     this.printWriter!!.flush()
                         while (scanner.hasNext()) {
                             Log.d(debug_TAG,"SCANNER READING FROM SOCKET")
-<<<<<<< HEAD
                             //scanner.nextLine()
                             val moveString = scanner.next()
                             val moveStrings = scanner.next()
@@ -82,12 +74,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             scanner.next()
                             scanner.next()
                             scanner.next()
-                            Log.d(debug_TAG, "RECIEVED MSG:")
-=======
-                            scanner.nextLine()
-                            val moveString = scanner.nextLine()
                             Log.d(debug_TAG, "RECEIVED MSG:")
->>>>>>> fedf44a4134be8902076e5bb61378aa2faf209b1
                             Log.d(debug_TAG, moveString)
                             Log.d(debug_TAG, moveStrings)
                             val move = coords.split("(")
