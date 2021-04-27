@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private lateinit var editText: EditText
     private var printWriter: PrintWriter? = null
     private val ack_msg = "ACK                                                                        "
-    var first = true
+    var app_move = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,36 +56,42 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     var text = editText.text.toString()
                     var ip: List<String> = text.split(":")
                     socket = Socket("${ip[0]}", ip[1].toInt())// 10.0.0.1 or 127.0.0.1 or 10.0.0.18
-                    val scanner = Scanner(socket.getInputStream())
+                    var scanner = Scanner(socket.getInputStream())
                     if (printWriter == null) {
                         printWriter = PrintWriter(socket.getOutputStream())
                     }
                     printWriter!!.println("Group 10 CAPSTONE CHESS")
                     printWriter!!.flush()
                     printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0")
-                    printWriter!!.flush()
-                    while(true){
+                    this.printWriter!!.flush()
                         while (scanner.hasNext()) {
                             Log.d(debug_TAG,"SCANNER READING FROM SOCKET")
-                            scanner.nextLine()
-                            val moveString = scanner.nextLine()
+                            //scanner.nextLine()
+                            val moveString = scanner.next()
+                            val moveStrings = scanner.next()
+                            val coords = scanner.next()
+                            scanner.next()
+                            scanner.next()
+                            scanner.next()
+                            scanner.next()
                             Log.d(debug_TAG, "RECIEVED MSG:")
                             Log.d(debug_TAG, moveString)
-                            val move = moveString.split("(")
+                            Log.d(debug_TAG, moveStrings)
+                            val move = coords.split("(")
                             val origX = move[1].split(",")
                             val origY = origX[1].split(")")
                             val toX = move[2].split(",")
                             val toY = toX[1].split(")")
+                            app_move = false
                             runOnUiThread {
-                                movePiece(
-                                    origX[0].toInt(),
-                                    origY[0].toInt(),
-                                    toX[0].toInt(),
-                                    toY[0].toInt()
-                                )
+                                Executors.newSingleThreadExecutor().execute {
+                                    printWriter!!.println(ack_msg)
+                                    printWriter!!.flush()
+                                }
+                                movePiece(origX[0].toInt(), origY[0].toInt(), toX[0].toInt(), toY[0].toInt())
                                 boardView.invalidate()
                             }
-                        }
+
                     }
                 }catch(e: ConnectException){
                     Log.d(debug_TAG, "failed connect")
@@ -116,16 +122,19 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
             val moveStr : String =
                 "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
-        printWriter.let {
+        if(app_move) {
+            printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
                     Log.d(debug_TAG, moveStr)
-                    if(!first) {
-                        it?.println(ack_msg)
-                    }
-                    first = false
+//                    if(!first) {
+//                        it?.println(ack_msg)
+//                    }
                     it?.println(moveStr)
                     it?.flush()
                 }
+            }
+        }else{
+            app_move = true
         }
     }
 }
