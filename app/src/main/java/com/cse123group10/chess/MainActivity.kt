@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private lateinit var socket: Socket
     private lateinit var editText: EditText
     private var printWriter: PrintWriter? = null
-    private val ack_msg = "ACK                                                                        "
-    var app_move = true
+    private val ackMsg = "ACK                                                                        "
+    var appMove = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             //scanner.nextLine()
                             val moveString = scanner.next()
                             val moveStrings = scanner.next()
-                            val coords = scanner.next()
+                            val coordinates = scanner.next()
                             scanner.next()
                             scanner.next()
                             scanner.next()
@@ -77,15 +77,15 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             Log.d(debug_TAG, "RECEIVED MSG:")
                             Log.d(debug_TAG, moveString)
                             Log.d(debug_TAG, moveStrings)
-                            val move = coords.split("(")
+                            val move = coordinates.split("(")
                             val origX = move[1].split(",")
                             val origY = origX[1].split(")")
                             val toX = move[2].split(",")
                             val toY = toX[1].split(")")
-                            app_move = false
+                            appMove = false
                             runOnUiThread {
                                 Executors.newSingleThreadExecutor().execute {
-                                    printWriter!!.println(ack_msg)
+                                    printWriter!!.println(ackMsg)
                                     printWriter!!.flush()
                                 }
                                 movePiece(origX[0].toInt(), origY[0].toInt(), toX[0].toInt(), toY[0].toInt())
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             }
 
                     }
-                }catch(e: ConnectException){
+                } catch (e: ConnectException) {
                     Log.d(debug_TAG, "failed connect")
                     findViewById<TextView>(R.id.editTextTextPersonName).text = "connection failed, input should be: ip:port"
                 }
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
             val moveStr =
                 "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
-        if(app_move) {
+        if (appMove) {
             printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
                     Log.d(debug_TAG, moveStr)
@@ -133,8 +133,8 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     it?.flush()
                 }
             }
-        }else{
-            app_move = true
+        } else {
+            appMove = true
         }
     }
 }
