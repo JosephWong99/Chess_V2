@@ -1,8 +1,13 @@
 package com.cse123group10.chess
 
 import android.os.Bundle
+import android.text.Layout
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AlignmentSpan
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -13,6 +18,7 @@ import java.net.ConnectException
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
+
 
 const val debug_TAG = "MainActivity"
 var checkFlag = 0
@@ -50,6 +56,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         connectButton = findViewById<Button>(R.id.Connect)
         editText = findViewById<EditText>(R.id.editTextTextPersonName)
         connectButton.setOnClickListener {
+            var checkmate: String
             Executors.newSingleThreadExecutor().execute {
                 try {
                     // Host should be personal computer IP address and port should be server port
@@ -65,7 +72,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0")
                     this.printWriter!!.flush()
                         while (scanner.hasNext()) {
-                            Log.d(debug_TAG,"SCANNER READING FROM SOCKET")
+                            Log.d(debug_TAG, "SCANNER READING FROM SOCKET")
                             //scanner.nextLine()
                             val moveString = scanner.next()
                             val moveStrings = scanner.next()
@@ -73,10 +80,33 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             scanner.next()
                             scanner.next()
                             scanner.next()
-                            scanner.next()
+                            checkmate = scanner.next()
                             Log.d(debug_TAG, "RECEIVED MSG:")
                             Log.d(debug_TAG, moveString)
                             Log.d(debug_TAG, moveStrings)
+                            if (checkmate.toBoolean()) {
+                                Log.d(debug_TAG, "You win!")
+                                val modalText = "You win!\nClick reset button to play again"
+                                val centeredText: Spannable = SpannableString(modalText)
+                                centeredText.setSpan(
+                                    AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                                    0, modalText.length - 1,
+                                    Spannable.SPAN_INCLUSIVE_INCLUSIVE
+                                )
+                                val duration = Toast.LENGTH_LONG
+                                runOnUiThread {
+                                    val modal = Toast.makeText(applicationContext, centeredText, duration)
+                                    modal.setGravity(Gravity.CENTER, 0, 0)
+                                    modal.show()
+                                }
+                            }
+//                            if (checkmate.toBoolean()) {
+//                                Log.d(debug_TAG, "You win!")
+//                                val text = "You win!"
+//                                val duration = Toast.LENGTH_SHORT
+//                                Toast.makeText(applicationContext, text, duration).show()
+//                            }
+                            Log.d(debug_TAG, "test4: $checkmate")
                             val move = coordinates.split("(")
                             val origX = move[1].split(",")
                             val origY = origX[1].split(")")
@@ -88,7 +118,12 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                                     printWriter!!.println(ackMsg)
                                     printWriter!!.flush()
                                 }
-                                movePiece(origX[0].toInt(), origY[0].toInt(), toX[0].toInt(), toY[0].toInt())
+                                movePiece(
+                                    origX[0].toInt(),
+                                    origY[0].toInt(),
+                                    toX[0].toInt(),
+                                    toY[0].toInt()
+                                )
                                 boardView.invalidate()
                             }
 
@@ -105,7 +140,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     }
 
     override fun pieceAt(col: Int, row: Int): Pieces? {
-        return boardModel.pieceAt(col,row)
+        return boardModel.pieceAt(col, row)
     }
 
     override fun movePiece(xOrig: Int, yOrig: Int, xTo: Int, yTon: Int) {
