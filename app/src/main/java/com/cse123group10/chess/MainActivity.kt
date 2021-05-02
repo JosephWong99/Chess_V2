@@ -84,8 +84,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         Log.d(debug_TAG, moveString)
                         Log.d(debug_TAG, moveStrings)
                         if (checkmate.toBoolean()) {
-                            var modalText: String
-                            modalText = if (appMove) {
+                            val modalText: String = if (appMove) {
                                 Log.d(debug_TAG, "You lose!")
                                 "You lose!\nClick reset button to play again"
                             } else {
