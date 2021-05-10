@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             Log.d(debug_TAG, "reset pressed")
             boardModel.startUp()
             boardView.invalidate()
+            socket?.close()
         }
         connectButton = findViewById<Button>(R.id.Connect)
         editText = findViewById<EditText>(R.id.editTextTextPersonName)
