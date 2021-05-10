@@ -66,9 +66,8 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                     if (printWriter == null) {
                         printWriter = PrintWriter(socket.getOutputStream())
                     }
-                    printWriter!!.println("Group 10 CAPSTONE CHESS")
-                    printWriter!!.flush()
-                    printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0")
+                    printWriter!!.println("Group 10 CAPSTONE CHESS                                        ")
+                    printWriter!!.println("New_game: True Color: White Saved_Game_Number: 0       ")
                     this.printWriter!!.flush()
                     while (scanner.hasNext()) {
                         Log.d(debug_TAG, "SCANNER READING FROM SOCKET")
