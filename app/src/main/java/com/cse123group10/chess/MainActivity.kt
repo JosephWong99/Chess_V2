@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private var printWriter: PrintWriter? = null
     private val ackMsg = "ACK                                                                        "
     var appMove = true
+    private var checkmate = "False"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         scanner.next()
                         scanner.next()
                         scanner.next()
-                        val checkmate = scanner.next()
+                        checkmate = scanner.next()
                         Log.d(debug_TAG, "RECEIVED MSG:")
                         Log.d(debug_TAG, moveString)
                         Log.d(debug_TAG, moveStrings)
@@ -125,6 +126,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                                 toX[0].toInt(),
                                 toY[0].toInt()
                             )
+//                            Log.d(debug_TAG, "test: " + checkMate(origX[0].toInt(), origY[0].toInt(), ))
                             boardView.invalidate()
                         }
 
@@ -156,8 +158,8 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
-            val moveStr =
-                "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
+        val moveStr =
+            "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: $checkmate                      "
         if (appMove) {
             printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
@@ -173,4 +175,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             appMove = true
         }
     }
+//    override fun checkMate(x: Int, y: Int): Boolean {
+//        return boardModel.checkMate(x, y)
+//    }
 }

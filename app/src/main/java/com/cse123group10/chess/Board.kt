@@ -8,7 +8,7 @@
 
 
  // this module contains the chess logic portion of the code
-// it handles placing and mocing pieces
+// it handles placing and moving pieces
 class Board {
     // creates all pieces
      var whiterookr = 0
@@ -796,4 +796,28 @@ class Board {
         board += "   A B C D E F G H\n"
         return board
     }
+
+     fun checkMate(x: Int, y: Int, color: Player): Boolean {
+         var piece = pieceAt(x, y)
+         if (kingCheckVertical(x, y, color) != null || kingCheckHorizontal(x, y, color) != null || kingCheckDiag(x, y, color) != null || kingCheckL(x, y, color) != null) {
+             if (kingCheckVertical(x, y - 1, color) != null || kingCheckHorizontal(x, y - 1, color) != null || kingCheckDiag(x, y - 1, color) != null || kingCheckL(x, y - 1, color) != null) {
+                 if (kingCheckVertical(x + 1, y - 1, color) != null || kingCheckHorizontal(x + 1, y - 1, color) != null || kingCheckDiag(x + 1, y - 1, color) != null || kingCheckL(x + 1, y - 1, color) != null) {
+                     if (kingCheckVertical(x + 1, y, color) != null || kingCheckHorizontal(x + 1, y, color) != null || kingCheckDiag(x + 1, y, color) != null || kingCheckL(x + 1, y, color) != null) {
+                         if (kingCheckVertical(x + 1, y + 1, color) != null || kingCheckHorizontal(x + 1, y + 1, color) != null || kingCheckDiag(x + 1, y + 1, color) != null || kingCheckL(x + 1, y + 1, color) != null) {
+                             if (kingCheckVertical(x, y + 1, color) != null || kingCheckHorizontal(x, y + 1, color) != null || kingCheckDiag(x, y + 1, color) != null || kingCheckL(x, y + 1, color) != null) {
+                                 if (kingCheckVertical(x - 1, y + 1, color) != null || kingCheckHorizontal(x - 1, y + 1, color) != null || kingCheckDiag(x - 1, y + 1, color) != null || kingCheckL(x - 1, y + 1, color) != null) {
+                                     if (kingCheckVertical(x - 1, y, color) != null || kingCheckHorizontal(x - 1, y, color) != null || kingCheckDiag(x - 1, y, color) != null || kingCheckL(x - 1, y, color) != null) {
+                                         if (kingCheckVertical(x - 1, y - 1, color) != null || kingCheckHorizontal(x - 1, y - 1, color) != null || kingCheckDiag(x - 1, y - 1, color) != null || kingCheckL(x - 1, y - 1, color) != null) {
+                                            return true
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+         return false
+     }
 }
