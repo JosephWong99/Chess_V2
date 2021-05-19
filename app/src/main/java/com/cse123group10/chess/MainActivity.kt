@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private val ackMsg =
         "ACK                                                                        "
     private var appMove = true
-    private var turn = Player.white
+    private var check = "False"
     private var checkmate = "False"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         val moveStrings = scanner.next()
                         val coordinates = scanner.next()
                         scanner.next()
-                        scanner.next()
+                        check = scanner.next()
                         scanner.next()
                         checkmate = scanner.next()
                         Log.d(debug_TAG, "RECEIVED MSG:")
@@ -87,10 +87,10 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         Log.d(debug_TAG, moveStrings)
                         if (checkmate.toBoolean()) {
                             val modalText: String = if (appMove) {
-                                Log.d(debug_TAG, "You lose!")
+//                                Log.d(debug_TAG, "You lose!")
                                 "You lose!\nClick reset button to play again"
                             } else {
-                                Log.d(debug_TAG, "You win!")
+//                                Log.d(debug_TAG, "You win!")
                                 "You win!\nClick reset button to play again"
                             }
                             val centeredText: Spannable = SpannableString(modalText)
@@ -127,22 +127,18 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                                 toX[0].toInt(),
                                 toY[0].toInt()
                             )
-                            turn = if (appMove) {
-                                Player.white
-                            } else {
-                                Player.black
-                            }
-                            Log.d(
-                                debug_TAG,
-                                "test: " + checkMate(
-                                    origX[0].toInt(),
-                                    origY[0].toInt(),
-                                    turn
-                                )
-                            )
                             boardView.invalidate()
                         }
-
+                        for (i in 0..7) {
+                            for (j in 0..7) {
+                                val king = pieceAt(j, i)
+                                if (king != null) {
+                                    if (king.type == Type.king) {
+                                        Log.d(debug_TAG, "test: " + checkMate(king.col, king.row, Player.black))
+                                    }
+                                }
+                            }
+                        }
                     }
                 } catch (e: ConnectException) {
                     Log.d(debug_TAG, "failed connect")
@@ -173,7 +169,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
         val moveStr =
-            "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: $checkmate                      "
+            "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: $check Checkmate: $checkmate                      "
         if (appMove) {
             printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
@@ -190,8 +186,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         }
     }
 
-    fun checkMate(x: Int, y: Int, color: Player): Boolean {
-        Log.d(debug_TAG, "inside1")
+    private fun checkMate(x: Int, y: Int, color: Player): Boolean {
         return boardModel.checkMate(x, y, color)
     }
 }
