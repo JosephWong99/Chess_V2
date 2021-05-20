@@ -133,8 +133,11 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             for (j in 0..7) {
                                 val king = pieceAt(j, i)
                                 if (king != null) {
-                                    if (king.type == Type.king) {
-                                        Log.d(debug_TAG, "test: " + checkMate(king.col, king.row, Player.black))
+//                                    Log.d(debug_TAG, "test: " + checkMate(king.col, king.row, Player.black))
+                                    if (king.type == Type.king && checkMate(king.col, king.row, Player.black)) {
+                                        Log.d(debug_TAG, "PENISES")
+//                                        check = "True"
+//                                        checkmate = "True"
                                     }
                                 }
                             }

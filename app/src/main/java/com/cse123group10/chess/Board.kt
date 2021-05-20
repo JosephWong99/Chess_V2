@@ -881,6 +881,10 @@ class Board {
         Log.d(debug_TAG, "inside Board.kt")
         if (kingCheckVertical(x, y, color) != null || kingCheckHorizontal(x, y, color) != null || kingCheckDiag(x, y, color) != null || kingCheckL(x, y, color) != null) {
             Log.d(debug_TAG, "inside 1st king check")
+            Log.d(debug_TAG, "test1: " + kingCheckVertical(x, y, color))
+            Log.d(debug_TAG, "test2: " + kingCheckHorizontal(x, y, color))
+            Log.d(debug_TAG, "test3: " + kingCheckDiag(x, y, color))
+            Log.d(debug_TAG, "test4: " + kingCheckL(x, y, color))
             if ((kingCheckVertical(x, y - 1, color) != null || kingCheckHorizontal(x, y - 1, color) != null || kingCheckDiag(x, y - 1, color) != null || kingCheckL(x, y - 1, color) != null) || pieceAt(x, y - 1) != null || x > 7 || (y - 1) > 7) {
                 Log.d(debug_TAG, "inside 2nd king check")
                 if ((kingCheckVertical(x + 1, y - 1, color) != null || kingCheckHorizontal(x + 1, y - 1, color) != null || kingCheckDiag(x + 1, y - 1, color) != null || kingCheckL(x + 1, y - 1, color) != null) || pieceAt(x + 1, y - 1) != null  || (x + 1) > 7 || (y - 1) > 7) {
