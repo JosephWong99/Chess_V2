@@ -23,18 +23,21 @@ import java.util.concurrent.Executors
 const val debug_TAG = "MainActivity"
 var checkFlag = 0
 var checkMoveFlag = 0
-private const val checkMessage = "King In Check"
-const val duration = Toast.LENGTH_LONG
+//private const val checkMessage = "King In Check"
 
 class MainActivity : AppCompatActivity(), ChessInterface {
-    var boardModel = Board()
+    private var boardModel = Board()
     private lateinit var boardView: ChessboardView
     private lateinit var connectButton: Button
     private lateinit var socket: Socket
     private lateinit var editText: EditText
     private var printWriter: PrintWriter? = null
-    private val ackMsg = "ACK                                                                        "
-    var appMove = true
+    private val ackMsg =
+        "ACK                                                                        "
+    private var appMove = true
+    private var check = "False"
+    private var checkmate = "False"
+    private var checkmateBool = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,16 +49,19 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         //Log.d(debug_TAG, "$boardModel")
         // create a interface so that there is only one board model to be able to pass information
         // from terminal model to screen
-        boardView = findViewById<ChessboardView>(R.id.chessboard_view)
+        boardView = findViewById(R.id.chessboard_view)
         boardView.boardInterface = this
         findViewById<Button>(R.id.Reset).setOnClickListener {
             Log.d(debug_TAG, "reset pressed")
             boardModel.startUp()
             boardView.invalidate()
-            socket?.close()
+            checkmateBool = false
+            socket.close()
         }
-        connectButton = findViewById<Button>(R.id.Connect)
-        editText = findViewById<EditText>(R.id.editTextTextPersonName)
+        connectButton = findViewById(R.id.Connect)
+        editText = findViewById(R.id.editTextTextPersonName)
+        var moveStrings = ""
+        var coordinates = ""
         connectButton.setOnClickListener {
             Executors.newSingleThreadExecutor().execute {
                 try {
@@ -74,21 +80,21 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         Log.d(debug_TAG, "SCANNER READING FROM SOCKET")
                         //scanner.nextLine()
                         val moveString = scanner.next()
-                        val moveStrings = scanner.next()
-                        val coordinates = scanner.next()
-                        scanner.next()
-                        scanner.next()
-                        scanner.next()
-                        val checkmate = scanner.next()
+                        if (!checkmateBool) {
+                            moveStrings = scanner.next()
+                            coordinates = scanner.next()
+                            scanner.next()
+                            check = scanner.next()
+                            scanner.next()
+                            checkmate = scanner.next()
+                        }
                         Log.d(debug_TAG, "RECEIVED MSG:")
                         Log.d(debug_TAG, moveString)
                         Log.d(debug_TAG, moveStrings)
                         if (checkmate.toBoolean()) {
-                            val modalText: String = if (appMove) {
-                                Log.d(debug_TAG, "You lose!")
+                            val modalText: String = if (!checkmateBool) {
                                 "You lose!\nClick reset button to play again"
                             } else {
-                                Log.d(debug_TAG, "You win!")
                                 "You win!\nClick reset button to play again"
                             }
                             val centeredText: Spannable = SpannableString(modalText)
@@ -127,11 +133,11 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             )
                             boardView.invalidate()
                         }
-
                     }
                 } catch (e: ConnectException) {
                     Log.d(debug_TAG, "failed connect")
-                    findViewById<TextView>(R.id.editTextTextPersonName).text = "connection failed, input should be: ip:port"
+                    findViewById<TextView>(R.id.editTextTextPersonName).text =
+                        "connection failed, input should be: ip:port"
                 }
             }
         }
@@ -156,8 +162,20 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
-            val moveStr =
-                "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: false Checkmate: False                      "
+        for (i in 0..7) {
+            for (j in 0..7) {
+                val king = pieceAt(j, i)
+                if (king != null) {
+                    if (king.type == Type.king && king.player == Player.black && checkMate(king.col, king.row, king.player)) {
+                        check = "True"
+                        checkmate = "True"
+                        checkmateBool = true
+                    }
+                }
+            }
+        }
+        val moveStr =
+            "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: $check Checkmate: $checkmate                      "
         if (appMove) {
             printWriter.let {
                 Executors.newSingleThreadExecutor().execute {
@@ -172,5 +190,9 @@ class MainActivity : AppCompatActivity(), ChessInterface {
         } else {
             appMove = true
         }
+    }
+
+    private fun checkMate(x: Int, y: Int, color: Player): Boolean {
+        return boardModel.checkMate(x, y, color)
     }
 }

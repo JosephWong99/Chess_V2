@@ -53,8 +53,8 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
                 pieceStartY = ((event.y-yStart)/lengthSquare).toInt()
             }
             MotionEvent.ACTION_UP->{
-                var pieceGotoX = ((event.x-xStart)/lengthSquare).toInt()
-                var pieceGotoY = ((event.y-yStart)/lengthSquare).toInt()
+                val pieceGotoX = ((event.x-xStart)/lengthSquare).toInt()
+                val pieceGotoY = ((event.y-yStart)/lengthSquare).toInt()
                 boardInterface?.movePiece(pieceStartX,pieceStartY,pieceGotoX,pieceGotoY)
                 //Log.d(debug_TAG,"($pieceStartX,$pieceStartY)->($pieceGotoX,$pieceGotoY)")
                 pieceStartX = -1
@@ -118,7 +118,7 @@ class ChessboardView(context: Context?, attrs: AttributeSet?) : View(context, at
             bitmaps[it] = BitmapFactory.decodeResource(resources,it)
         }
     }
-    // draw each piece in inital places
+    // draw each piece in initial places
     private fun drawPieces(canvas: Canvas?){
         for(j in 0..7){
             for (i in 0..7){
