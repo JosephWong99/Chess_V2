@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity(), ChessInterface {
     private var appMove = true
     private var check = "False"
     private var checkmate = "False"
+    private var checkmateBool = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -54,10 +55,13 @@ class MainActivity : AppCompatActivity(), ChessInterface {
             Log.d(debug_TAG, "reset pressed")
             boardModel.startUp()
             boardView.invalidate()
+            checkmateBool = false
             socket.close()
         }
         connectButton = findViewById(R.id.Connect)
         editText = findViewById(R.id.editTextTextPersonName)
+        var moveStrings = ""
+        var coordinates = ""
         connectButton.setOnClickListener {
             Executors.newSingleThreadExecutor().execute {
                 try {
@@ -76,21 +80,21 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                         Log.d(debug_TAG, "SCANNER READING FROM SOCKET")
                         //scanner.nextLine()
                         val moveString = scanner.next()
-                        val moveStrings = scanner.next()
-                        val coordinates = scanner.next()
-                        scanner.next()
-                        check = scanner.next()
-                        scanner.next()
-                        checkmate = scanner.next()
+                        if (!checkmateBool) {
+                            moveStrings = scanner.next()
+                            coordinates = scanner.next()
+                            scanner.next()
+                            check = scanner.next()
+                            scanner.next()
+                            checkmate = scanner.next()
+                        }
                         Log.d(debug_TAG, "RECEIVED MSG:")
                         Log.d(debug_TAG, moveString)
                         Log.d(debug_TAG, moveStrings)
                         if (checkmate.toBoolean()) {
-                            val modalText: String = if (appMove) {
-//                                Log.d(debug_TAG, "You lose!")
+                            val modalText: String = if (!checkmateBool) {
                                 "You lose!\nClick reset button to play again"
                             } else {
-//                                Log.d(debug_TAG, "You win!")
                                 "You win!\nClick reset button to play again"
                             }
                             val centeredText: Spannable = SpannableString(modalText)
@@ -129,19 +133,6 @@ class MainActivity : AppCompatActivity(), ChessInterface {
                             )
                             boardView.invalidate()
                         }
-                        for (i in 0..7) {
-                            for (j in 0..7) {
-                                val king = pieceAt(j, i)
-                                if (king != null) {
-//                                    Log.d(debug_TAG, "test: " + checkMate(king.col, king.row, Player.black))
-                                    if (king.type == Type.king && checkMate(king.col, king.row, Player.black)) {
-                                        Log.d(debug_TAG, "PENISES")
-//                                        check = "True"
-//                                        checkmate = "True"
-                                    }
-                                }
-                            }
-                        }
                     }
                 } catch (e: ConnectException) {
                     Log.d(debug_TAG, "failed connect")
@@ -171,6 +162,18 @@ class MainActivity : AppCompatActivity(), ChessInterface {
 //            findViewById<TextView>(R.id.editTextTextPersonName).text = "King is in check, move King"
 //        }
         // Coordinates: (x_0, y_0) (x_1,y_1) Check: True/False Checkmate: True/False
+        for (i in 0..7) {
+            for (j in 0..7) {
+                val king = pieceAt(j, i)
+                if (king != null) {
+                    if (king.type == Type.king && king.player == Player.black && checkMate(king.col, king.row, king.player)) {
+                        check = "True"
+                        checkmate = "True"
+                        checkmateBool = true
+                    }
+                }
+            }
+        }
         val moveStr =
             "Coordinates: (${xOrig},${yOrig})(${xTo},${yTon}) Check: $check Checkmate: $checkmate                      "
         if (appMove) {
