@@ -878,29 +878,15 @@ class Board {
     }
 
     fun checkMate(x: Int, y: Int, color: Player): Boolean {
-        Log.d(debug_TAG, "inside Board.kt")
         if (kingCheckVertical(x, y, color) != null || kingCheckHorizontal(x, y, color) != null || kingCheckDiag(x, y, color) != null || kingCheckL(x, y, color) != null) {
-            Log.d(debug_TAG, "inside 1st king check")
-            Log.d(debug_TAG, "test1: x = $x y = $y " + kingCheckVertical(x, y - 1, color))
-            Log.d(debug_TAG, "test2: x = $x y = $y " + kingCheckHorizontal(x, y - 1, color))
-            Log.d(debug_TAG, "test3: x = $x y = $y " + kingCheckDiag(x, y - 1, color))
-            Log.d(debug_TAG, "test4: x = $x y = $y " + kingCheckL(x, y - 1, color))
             if ((kingCheckVertical(x, y - 1, color) != null || kingCheckHorizontal(x, y - 1, color) != null || kingCheckDiag(x, y - 1, color) != null || kingCheckL(x, y - 1, color) != null) || pieceAt(x, y - 1) != null || x > 7 || (y - 1) > 7 || x < 0 || (y - 1) < 0) {
-                Log.d(debug_TAG, "inside 2nd king check")
                 if ((kingCheckVertical(x + 1, y - 1, color) != null || kingCheckHorizontal(x + 1, y - 1, color) != null || kingCheckDiag(x + 1, y - 1, color) != null || kingCheckL(x + 1, y - 1, color) != null) || pieceAt(x + 1, y - 1) != null  || (x + 1) > 7 || (y - 1) > 7 || (x + 1) < 0 || (y - 1) < 0) {
-                    Log.d(debug_TAG, "inside 3rd king check")
                     if ((kingCheckVertical(x + 1, y, color) != null || kingCheckHorizontal(x + 1, y, color) != null || kingCheckDiag(x + 1, y, color) != null || kingCheckL(x + 1, y, color) != null) || pieceAt(x + 1, y) != null || (x + 1) > 7 || y > 7 || (x + 1) < 0 || y < 0) {
-                        Log.d(debug_TAG, "inside 4th king check")
                         if ((kingCheckVertical(x + 1, y + 1, color) != null || kingCheckHorizontal(x + 1, y + 1, color) != null || kingCheckDiag(x + 1, y + 1, color) != null || kingCheckL(x + 1, y + 1, color) != null) || pieceAt(x + 1, y + 1) != null || (x + 1) > 7 || (y + 1) > 7 || (x + 1) < 0 || (y + 1) < 0) {
-                            Log.d(debug_TAG, "inside 5th king check")
                             if ((kingCheckVertical(x, y + 1, color) != null || kingCheckHorizontal(x, y + 1, color) != null || kingCheckDiag(x, y + 1, color) != null || kingCheckL(x, y + 1, color) != null) || pieceAt(x, y + 1) != null || x > 7 || (y + 1) > 7 || x < 0 || (y + 1) < 0) {
-                                Log.d(debug_TAG, "inside 6th king check")
                                 if ((kingCheckVertical(x - 1, y + 1, color) != null || kingCheckHorizontal(x - 1, y + 1, color) != null || kingCheckDiag(x - 1, y + 1, color) != null || kingCheckL(x - 1, y + 1, color) != null) || pieceAt(x - 1, y + 1) != null || (x - 1) > 7 || (y + 1) > 7 || (x - 1) < 0 || (y + 1) < 0) {
-                                    Log.d(debug_TAG, "inside 7th king check")
                                     if ((kingCheckVertical(x - 1, y, color) != null || kingCheckHorizontal(x - 1, y, color) != null || kingCheckDiag(x - 1, y, color) != null || kingCheckL(x - 1, y, color) != null) || pieceAt(x - 1, y) != null  || (x - 1) > 7 || y > 7 || (x - 1) < 0 || y < 0) {
-                                        Log.d(debug_TAG, "inside 8th king check")
                                         if ((kingCheckVertical(x - 1, y - 1, color) != null || kingCheckHorizontal(x - 1, y - 1, color) != null || kingCheckDiag(x - 1, y - 1, color) != null || kingCheckL(x - 1, y - 1, color) != null) || pieceAt(x - 1, y - 1) != null || (x - 1) > 7 || (y - 1) > 7 || (x - 1) < 0 || (y - 1) < 0) {
-                                            Log.d(debug_TAG, "fully inside king checks")
                                             return true
                                         }
                                     }
